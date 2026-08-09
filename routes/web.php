@@ -1,7 +1,63 @@
 <?php
 
+use App\Http\Controllers\AttachmentController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\OdontogramController;
+use App\Http\Controllers\PatientController;
+use App\Http\Controllers\QueueController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\VisitController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/', fn () => redirect()->route('login'));
+
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.attempt');
+});
+
+// Public TV/monitor display — no login (runs unattended in the waiting room).
+Route::get('/queues/display', [QueueController::class, 'display'])->name('queues.display');
+Route::get('/queues/display-data', [QueueController::class, 'displayData'])->name('queues.display-data');
+
+Route::middleware('auth')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::resource('patients', PatientController::class)->except(['destroy']);
+    Route::put('/patients/{patient}/medical-history', [PatientController::class, 'updateMedicalHistory'])
+        ->name('patients.medical-history.update');
+
+    Route::get('/queues', [QueueController::class, 'index'])->name('queues.index');
+    Route::post('/queues', [QueueController::class, 'store'])->name('queues.store');
+    Route::post('/queues/{queue}/call', [QueueController::class, 'call'])->name('queues.call');
+    Route::post('/queues/{queue}/recall', [QueueController::class, 'recall'])->name('queues.recall');
+    Route::post('/queues/{queue}/skip', [QueueController::class, 'skip'])->name('queues.skip');
+    Route::get('/queues/{queue}/print', [QueueController::class, 'print'])->name('queues.print');
+    Route::post('/queues/{queue}/start-examination', [QueueController::class, 'startExamination'])->name('queues.start-examination');
+
+    Route::get('/visits', [VisitController::class, 'index'])->name('visits.index');
+    Route::get('/visits/{visit}', [VisitController::class, 'show'])->name('visits.show');
+    Route::put('/visits/{visit}', [VisitController::class, 'update'])->name('visits.update');
+    Route::post('/visits/{visit}/complete', [VisitController::class, 'complete'])->name('visits.complete');
+    Route::post('/visits/{visit}/treatments', [VisitController::class, 'storeTreatment'])->name('visits.treatments.store');
+    Route::delete('/visits/{visit}/treatments/{treatment}', [VisitController::class, 'destroyTreatment'])->name('visits.treatments.destroy');
+
+    Route::put('/visits/{visit}/odontogram', [OdontogramController::class, 'update'])->name('visits.odontogram.update');
+    Route::post('/visits/{visit}/odontogram/teeth', [OdontogramController::class, 'updateTooth'])->name('visits.odontogram.teeth.update');
+
+    Route::post('/visits/{visit}/attachments', [AttachmentController::class, 'store'])->name('visits.attachments.store');
+    Route::delete('/visits/{visit}/attachments/{attachment}', [AttachmentController::class, 'destroy'])->name('visits.attachments.destroy');
+
+    Route::get('/reports/visits', [ReportController::class, 'visits'])->name('reports.visits');
+    Route::get('/reports/queues', [ReportController::class, 'queues'])->name('reports.queues');
+    Route::get('/reports/patients', [ReportController::class, 'patients'])->name('reports.patients');
+    Route::get('/reports/treatments', [ReportController::class, 'treatments'])->name('reports.treatments');
+
+    Route::middleware('role:admin')->group(function () {
+        Route::resource('users', UserController::class)->except(['show']);
+    });
 });

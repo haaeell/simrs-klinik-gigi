@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node driver3.mjs)",
+      "Bash(mysql -u root -D klinik_gigi -e ' *)",
+      "Bash(node driver4.mjs)",
+      "Bash(mysql -u root -D klinik_gigi -e \"SHOW TABLES LIKE 'visits'; DESCRIBE visits;\")",
+      "Bash(:)",
+      "Bash(node debug-start-exam.mjs)",
+      "Bash(node driver5.mjs)",
+      "Bash(mysql -u root -D klinik_gigi -e \"SELECT v.id, p.medical_record_number FROM visits v JOIN patients p ON p.id=v.patient_id WHERE v.status='examining';\")",
+      "Bash(python3 -c *)",
+      "Bash(node driver6.mjs)",
+      "Bash(php -i)",
+      "Bash(lsof -ti:8000 -sTCP:LISTEN)",
+      "Bash(node driver7.mjs)",
+      "Bash(mysql -u root -D klinik_gigi -e \"SELECT id, diagnosis FROM visits WHERE id=2;\")",
+      "Bash(node driver8.mjs)",
+      "Bash(cd \"/Users/user/JOKI/SKRIPSI/SIROJUDDIN TI/klinik-gigi\" && ls storage/app/public/attachments/ 2>/dev/null | wc -l && rm -rf storage/app/public/attachments/* 2>/dev/null && echo \"cleaned orphaned test upload files\" && ls storage/app/public/)",
+      "Bash(node final-smoke.mjs)"
+    ],
+    "additionalDirectories": [
+      "/Users/user/JOKI/SKRIPSI/SIROJUDDIN TI/klinik-gigi/storage/app/public/attachments"
+    ]
+  }
+}
