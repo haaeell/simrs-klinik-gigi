@@ -17,7 +17,12 @@
       "Bash(mysql -u root -D klinik_gigi -e \"SELECT id, diagnosis FROM visits WHERE id=2;\")",
       "Bash(node driver8.mjs)",
       "Bash(cd \"/Users/user/JOKI/SKRIPSI/SIROJUDDIN TI/klinik-gigi\" && ls storage/app/public/attachments/ 2>/dev/null | wc -l && rm -rf storage/app/public/attachments/* 2>/dev/null && echo \"cleaned orphaned test upload files\" && ls storage/app/public/)",
-      "Bash(node final-smoke.mjs)"
+      "Bash(node final-smoke.mjs)",
+      "Bash(node diagnose.mjs)",
+      "Bash(awk 'NR==19{print length\\($0\\); print}' resources/views/layouts/app.blade.php)",
+      "Bash(node verify-fix.mjs)",
+      "Bash(mysql -u root -D klinik_gigi -e \"SELECT id FROM visits WHERE status='examining' LIMIT 1;\")",
+      "Bash(node verify-fix2.mjs)"
     ],
     "additionalDirectories": [
       "/Users/user/JOKI/SKRIPSI/SIROJUDDIN TI/klinik-gigi/storage/app/public/attachments"

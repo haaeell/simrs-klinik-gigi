@@ -16,7 +16,7 @@
 
     <div id="sidebar-overlay" class="fixed inset-0 z-30 hidden bg-slate-900/50 lg:hidden print:hidden"></div>
 
-    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 flex w-64 -translate-x-full flex-col border-r border-slate-200 bg-white transition-transform duration-200 ease-in-out lg:static lg:translate-x-0 lg:shrink-0 print:hidden"
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 flex w-64 -translate-x-full flex-col border-r border-slate-200 bg-white transition-transform duration-200 ease-in-out lg:translate-x-0 print:hidden">
         <div class="flex h-16 shrink-0 items-center gap-2 border-b border-slate-200 px-5">
             <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white">
                 <i class="fa-solid fa-tooth"></i>
