@@ -7,3 +7,163 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+@layer components {
+    .odontogram-tooth {
+        display: flex;
+        min-width: 0;
+        min-height: 6.4rem;
+        width: 100%;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.5rem;
+        border: 1px solid transparent;
+        background: transparent;
+        padding: 0.125rem 0;
+        transition: transform 150ms ease, border-color 150ms ease, background-color 150ms ease;
+    }
+
+    .odontogram-tooth__number {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 700;
+        line-height: 1;
+        color: #111827;
+    }
+
+    .odontogram-tooth__shape {
+        position: relative;
+        display: block;
+        height: 4.5rem;
+        width: min(3.1rem, 100%);
+    }
+
+    .odontogram-tooth__svg {
+        position: absolute;
+        inset: 0;
+        height: 100%;
+        width: 100%;
+        overflow: visible;
+    }
+
+    .odontogram-tooth__outer {
+        fill: rgb(255 255 255 / 0.8);
+        stroke: #9ca3af;
+        stroke-width: 3.4;
+        stroke-linejoin: round;
+        filter: drop-shadow(0 4px 6px rgb(15 23 42 / 0.08));
+    }
+
+    .odontogram-tooth__inner {
+        stroke: #cbd5e1;
+        stroke-linecap: round;
+        stroke-width: 2.7;
+        opacity: 0.72;
+    }
+
+    .odontogram-tooth__gumline {
+        opacity: 0.36;
+    }
+
+    .odontogram-tooth__mark {
+        position: absolute;
+        left: 0.56rem;
+        right: 0.56rem;
+        top: 0.8rem;
+        height: 2.4rem;
+        border-radius: 0.75rem 0.75rem 0.45rem 0.45rem;
+        opacity: 0;
+        mix-blend-mode: multiply;
+    }
+
+    .odontogram-tooth__spot {
+        position: absolute;
+        right: 0.12rem;
+        top: 0;
+        height: 1rem;
+        width: 1rem;
+        border-radius: 9999px;
+        opacity: 0.96;
+        box-shadow: 0 2px 5px rgb(15 23 42 / 0.12);
+    }
+
+    .odontogram-tooth.is-marked .odontogram-tooth__spot {
+        opacity: 1;
+    }
+
+    .odontogram-tooth--lower .odontogram-tooth__shape {
+        transform: rotate(180deg);
+    }
+
+    .odontogram-tooth--normal .odontogram-tooth__spot {
+        opacity: 0.9;
+        box-shadow: 0 1px 4px rgb(148 163 184 / 0.14);
+    }
+
+    .odontogram-tooth--karies .odontogram-tooth__mark {
+        background: rgb(248 113 113 / 0.76);
+        opacity: 1;
+    }
+
+    .odontogram-tooth--tambalan .odontogram-tooth__mark {
+        left: 0.78rem;
+        right: 0.78rem;
+        top: 0.98rem;
+        height: 1.78rem;
+        border-radius: 0.5rem;
+        background: rgb(37 99 235 / 0.68);
+        opacity: 1;
+    }
+
+    .odontogram-tooth--hilang .odontogram-tooth__outer {
+        fill: rgb(100 116 139 / 0.58);
+        stroke: #6b7280;
+    }
+
+    .odontogram-tooth--hilang .odontogram-tooth__inner {
+        stroke: rgb(255 255 255 / 0.4);
+    }
+
+    .odontogram-tooth--akar .odontogram-tooth__mark {
+        left: 1.02rem;
+        right: 1.02rem;
+        top: 2.3rem;
+        height: 0.84rem;
+        border-radius: 9999px;
+        background: rgb(16 185 129 / 0.68);
+        opacity: 1;
+    }
+
+    .odontogram-tooth--crown .odontogram-tooth__mark {
+        background: rgb(139 92 246 / 0.58);
+        opacity: 1;
+    }
+
+    .odontogram-tooth--patah .odontogram-tooth__spot {
+        opacity: 1;
+    }
+
+    .odontogram-tooth--sisa-akar .odontogram-tooth__outer {
+        fill: rgb(146 64 14 / 0.18);
+        stroke: #92400e;
+    }
+
+    .odontogram-tooth--sisa-akar .odontogram-tooth__inner {
+        opacity: 0.18;
+    }
+
+    .odontogram-tooth--belum-erupsi .odontogram-tooth__shape {
+        opacity: 0.42;
+    }
+
+    .odontogram-tooth--lainnya .odontogram-tooth__mark {
+        left: 0.95rem;
+        right: 0.95rem;
+        top: 1.32rem;
+        height: 1.18rem;
+        border-radius: 9999px;
+        background: rgb(20 184 166 / 0.62);
+        opacity: 1;
+    }
+}

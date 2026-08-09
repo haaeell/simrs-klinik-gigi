@@ -10,7 +10,7 @@
         <div class="mb-4">
             <label class="mb-2 block text-xs font-medium text-slate-600">Kondisi</label>
             <div class="flex flex-wrap gap-1.5">
-                @foreach (\App\Models\Odontogram::CONDITIONS as $condition)
+                @foreach (['Normal', 'Karies', 'Tambalan', 'Gigi Hilang', 'Perawatan Saluran Akar', 'Mahkota / Crown', 'Gigi Patah', 'Sisa Akar', 'Belum Erupsi', 'Lainnya'] as $condition)
                     <button type="button" data-condition-option="{{ $condition }}"
                         class="rounded-full border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50">
                         {{ $condition }}

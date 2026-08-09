@@ -18,8 +18,9 @@ class Odontogram extends Model
     public const LOWER_TEETH = ['48', '47', '46', '45', '44', '43', '42', '41', '31', '32', '33', '34', '35', '36', '37', '38'];
 
     public const CONDITIONS = [
-        'Normal', 'Karies', 'Gigi Hilang', 'Sisa Akar', 'Non Vital', 'Fraktur',
-        'Un-erupted', 'Partial Erupted', 'Anomali', 'Implant', 'Crown', 'Lainnya',
+        'Normal', 'Karies', 'Tambalan', 'Gigi Hilang', 'Perawatan Saluran Akar',
+        'Mahkota / Crown', 'Gigi Patah', 'Sisa Akar', 'Belum Erupsi', 'Lainnya',
+        'Non Vital', 'Fraktur', 'Un-erupted', 'Partial Erupted', 'Anomali', 'Implant', 'Crown',
     ];
 
     public const SURFACES = ['M', 'O', 'D', 'V', 'L'];

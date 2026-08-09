@@ -73,10 +73,32 @@
         </div>
     </div>
 
-    <div class="space-y-6">
+    <div class="space-y-6" data-tabs
+        data-tab-active-class="border-blue-600 text-blue-700"
+        data-tab-inactive-class="border-transparent text-slate-500 hover:text-slate-900">
+        <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div class="flex gap-8 overflow-x-auto border-b border-slate-200 px-6">
+                <button type="button" data-tab-target="identitas" class="shrink-0 border-b-4 px-1 py-4 text-sm font-semibold">
+                    Identitas
+                </button>
+                <button type="button" data-tab-target="odontogram" class="shrink-0 border-b-4 px-1 py-4 text-sm font-semibold">
+                    Odontogram
+                </button>
+                <button type="button" data-tab-target="tindakan" class="shrink-0 border-b-4 px-1 py-4 text-sm font-semibold">
+                    Tindakan / Perawatan
+                </button>
+                <button type="button" data-tab-target="lampiran" class="shrink-0 border-b-4 px-1 py-4 text-sm font-semibold">
+                    Lampiran
+                </button>
+                <button type="button" data-tab-target="riwayat" class="shrink-0 border-b-4 px-1 py-4 text-sm font-semibold">
+                    Riwayat Kunjungan
+                </button>
+            </div>
+        </div>
+
         {{-- Keluhan / Diagnosis / ICD-10 / Catatan --}}
-        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-            <h3 class="mb-5 text-sm font-semibold text-slate-900">Pemeriksaan</h3>
+        <div data-tab-panel="identitas" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+            <h3 class="mb-5 text-sm font-semibold text-slate-900">Identitas & Pemeriksaan</h3>
 
             @if ($canEdit)
                 <form method="POST" action="{{ route('visits.update', $visit) }}">
@@ -137,121 +159,93 @@
         </div>
 
         {{-- Odontogram --}}
-        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-            <div class="mb-5 flex items-center justify-between">
-                <h3 class="text-sm font-semibold text-slate-900">Odontogram</h3>
-                <div class="flex items-center gap-1.5 text-xs text-slate-400">
-                    <span class="h-2 w-2 rounded-full bg-blue-500"></span> Ada kondisi
+        @php
+            $odontogram = $visit->odontogram;
+            $teethByNumber = $odontogram?->teeth->keyBy('tooth_number') ?? collect();
+            $notableTeeth = $teethByNumber->filter(fn ($t) => $t->condition && $t->condition !== 'Normal')->sortBy('tooth_number');
+            $odontogramHistory = $visit->patient->odontograms
+                ->sortByDesc('examination_date')
+                ->take(3);
+            $legend = [
+                ['label' => 'Normal', 'class' => 'bg-white ring-1 ring-slate-300'],
+                ['label' => 'Karies', 'class' => 'bg-red-500'],
+                ['label' => 'Tambalan', 'class' => 'bg-blue-600'],
+                ['label' => 'Gigi Hilang', 'class' => 'bg-slate-500'],
+                ['label' => 'Perawatan Saluran Akar', 'class' => 'bg-emerald-500'],
+                ['label' => 'Mahkota / Crown', 'class' => 'bg-violet-500'],
+                ['label' => 'Gigi Patah', 'class' => 'bg-orange-500'],
+                ['label' => 'Sisa Akar', 'class' => 'bg-amber-800'],
+                ['label' => 'Belum Erupsi', 'class' => 'bg-rose-300'],
+                ['label' => 'Lainnya', 'class' => 'bg-teal-500'],
+            ];
+        @endphp
+
+        <div data-tab-panel="odontogram" class="hidden overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div id="odontogram-section" class="grid items-start gap-4 p-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
+                <div class="rounded-lg border border-slate-200 bg-white p-4">
+                    <h3 class="mb-4 text-base font-semibold text-slate-900">Odontogram Gigi Permanen</h3>
+                    @include('partials.odontogram-grid', [
+                        'teethByNumber' => $teethByNumber,
+                        'interactive' => $canEdit,
+                        'saveUrl' => $canEdit ? route('visits.odontogram.teeth.update', $visit) : null,
+                    ])
                 </div>
-            </div>
 
-            @php
-                $odontogram = $visit->odontogram;
-                $teethByNumber = $odontogram?->teeth->keyBy('tooth_number') ?? collect();
-                $notableTeeth = $teethByNumber->filter(fn ($t) => $t->condition && $t->condition !== 'Normal')->sortBy('tooth_number');
-            @endphp
-
-            @include('partials.odontogram-grid', [
-                'teethByNumber' => $teethByNumber,
-                'interactive' => $canEdit,
-                'saveUrl' => $canEdit ? route('visits.odontogram.teeth.update', $visit) : null,
-            ])
-
-            <div class="mt-6 border-t border-slate-100 pt-4">
-                <div data-notable-list class="divide-y divide-slate-100 {{ $notableTeeth->isEmpty() ? 'hidden' : '' }}">
-                    @foreach ($notableTeeth as $tooth)
-                        <div class="py-2 text-sm" data-notable-item="{{ $tooth->tooth_number }}">
-                            <span class="font-semibold text-slate-900">Gigi {{ $tooth->tooth_number }}</span>
-                            <span class="text-slate-500" data-notable-text>&mdash; {{ $tooth->condition }}{{ $tooth->surfaces ? " ({$tooth->surfaces})" : '' }}</span>
-                            <p class="text-xs text-slate-400 {{ $tooth->notes ? '' : 'hidden' }}" data-notable-notes>{{ $tooth->notes }}</p>
+                <aside class="space-y-4">
+                    <div class="rounded-lg border border-slate-200 bg-white p-4">
+                        <h3 class="mb-4 text-sm font-semibold text-slate-900">Riwayat Odontogram</h3>
+                        <div class="rounded-lg border border-slate-200 p-3">
+                            @forelse ($odontogramHistory as $history)
+                                <div class="{{ ! $loop->last ? 'mb-4' : '' }}">
+                                    <div class="flex items-center justify-between gap-3">
+                                        <p class="text-sm font-semibold text-slate-900">{{ $history->examination_date->translatedFormat('d F Y') }}</p>
+                                        @if ($history->id === $odontogram?->id)
+                                            <span class="rounded-md bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-700">Aktif</span>
+                                        @endif
+                                    </div>
+                                    <p class="mt-1 text-xs font-medium text-slate-500">{{ $history->doctor->name }}</p>
+                                </div>
+                            @empty
+                                <p class="text-sm text-slate-400">Belum ada riwayat odontogram.</p>
+                            @endforelse
                         </div>
-                    @endforeach
-                </div>
-                <p data-notable-empty class="text-sm text-slate-400 {{ $notableTeeth->isNotEmpty() ? 'hidden' : '' }}">Belum ada gigi dengan kondisi khusus.</p>
-            </div>
+                    </div>
 
-            <div class="mt-6 border-t border-slate-100 pt-5">
-                <p class="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">Temuan Umum</p>
-
-                @if ($canEdit)
-                    <form method="POST" action="{{ route('visits.odontogram.update', $visit) }}" class="space-y-4">
-                        @csrf
-                        @method('PUT')
-                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                            <div>
-                                <label class="mb-1 block text-xs font-medium text-slate-600">Oklusi</label>
-                                <input type="text" name="occlusion" value="{{ old('occlusion', $odontogram?->occlusion) }}"
-                                    class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100">
-                            </div>
-                            <div>
-                                <label class="mb-1 block text-xs font-medium text-slate-600">Torus Palatinus</label>
-                                <input type="text" name="torus_palatinus" value="{{ old('torus_palatinus', $odontogram?->torus_palatinus) }}"
-                                    class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100">
-                            </div>
-                            <div>
-                                <label class="mb-1 block text-xs font-medium text-slate-600">Torus Mandibularis</label>
-                                <input type="text" name="torus_mandibularis" value="{{ old('torus_mandibularis', $odontogram?->torus_mandibularis) }}"
-                                    class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100">
-                            </div>
-                            <div>
-                                <label class="mb-1 block text-xs font-medium text-slate-600">Palatum</label>
-                                <input type="text" name="palate" value="{{ old('palate', $odontogram?->palate) }}"
-                                    class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100">
-                            </div>
-                            <div>
-                                <label class="mb-1 block text-xs font-medium text-slate-600">Diastema</label>
-                                <input type="text" name="diastema" value="{{ old('diastema', $odontogram?->diastema) }}"
-                                    class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100">
-                            </div>
-                            <div>
-                                <label class="mb-1 block text-xs font-medium text-slate-600">Anomali Gigi</label>
-                                <input type="text" name="dental_anomaly" value="{{ old('dental_anomaly', $odontogram?->dental_anomaly) }}"
-                                    class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="mb-1 block text-xs font-medium text-slate-600">Catatan Umum</label>
-                            <textarea name="notes" rows="2"
-                                class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100">{{ old('notes', $odontogram?->notes) }}</textarea>
-                        </div>
-                        <div class="flex justify-end">
-                            <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
-                                <i class="fa-solid fa-floppy-disk"></i> Simpan Temuan Umum
-                            </button>
-                        </div>
-                    </form>
-                @else
-                    @php
-                        $generalFindings = collect([
-                            'Oklusi' => $odontogram?->occlusion, 'Torus Palatinus' => $odontogram?->torus_palatinus,
-                            'Torus Mandibularis' => $odontogram?->torus_mandibularis, 'Palatum' => $odontogram?->palate,
-                            'Diastema' => $odontogram?->diastema, 'Anomali Gigi' => $odontogram?->dental_anomaly,
-                        ])->filter();
-                    @endphp
-                    @if ($generalFindings->isNotEmpty() || $odontogram?->notes)
-                        <dl class="grid grid-cols-1 gap-x-6 gap-y-3 text-sm sm:grid-cols-3">
-                            @foreach ($generalFindings as $label => $value)
-                                <div>
-                                    <dt class="text-xs text-slate-400">{{ $label }}</dt>
-                                    <dd class="mt-0.5 text-slate-700">{{ $value }}</dd>
+                    <div class="rounded-lg border border-slate-200 bg-white p-4">
+                        <h3 class="mb-4 text-sm font-semibold text-slate-900">Keterangan</h3>
+                        <div class="space-y-3">
+                            @foreach ($legend as $item)
+                                <div class="flex items-center gap-3 text-sm text-slate-600">
+                                    <span class="h-4 w-4 shrink-0 rounded-full {{ $item['class'] }}"></span>
+                                    <span>{{ $item['label'] }}</span>
                                 </div>
                             @endforeach
-                            @if ($odontogram?->notes)
-                                <div class="sm:col-span-3">
-                                    <dt class="text-xs text-slate-400">Catatan Umum</dt>
-                                    <dd class="mt-0.5 text-slate-700">{{ $odontogram->notes }}</dd>
-                                </div>
-                            @endif
-                        </dl>
-                    @else
-                        <p class="text-sm text-slate-400">Tidak ada temuan umum dicatat.</p>
-                    @endif
-                @endif
+                        </div>
+                    </div>
+                </aside>
+
+                <div class="rounded-lg border border-slate-200 bg-white p-5 lg:col-span-2">
+                    <h3 class="mb-3 text-sm font-semibold text-slate-900">Daftar Kondisi Gigi</h3>
+                    <div data-notable-list class="grid gap-3 md:grid-cols-2 xl:grid-cols-3 {{ $notableTeeth->isEmpty() ? 'hidden' : '' }}">
+                        @foreach ($notableTeeth as $tooth)
+                            <div class="rounded-lg border border-slate-200 px-3 py-2 text-sm" data-notable-item="{{ $tooth->tooth_number }}">
+                                <span class="font-semibold text-slate-900">Gigi {{ $tooth->tooth_number }}</span>
+                                <span class="text-slate-500" data-notable-text>- {{ $tooth->condition }}{{ $tooth->surfaces ? " ({$tooth->surfaces})" : '' }}</span>
+                                <p class="text-xs text-slate-400 {{ $tooth->notes ? '' : 'hidden' }}" data-notable-notes>{{ $tooth->notes }}</p>
+                            </div>
+                        @endforeach
+                    </div>
+                    <p data-notable-empty class="text-sm text-slate-400 {{ $notableTeeth->isNotEmpty() ? 'hidden' : '' }}">Semua gigi dalam kondisi normal.</p>
+                </div>
+
+                <div class="rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-medium text-slate-600 lg:col-span-2">
+                    <i class="fa-solid fa-circle-info mr-2 text-blue-500"></i> Klik pada gigi untuk memilih dan mengisi kondisi gigi.
+                </div>
             </div>
         </div>
 
         {{-- Tindakan / Perawatan --}}
-        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <div data-tab-panel="tindakan" class="hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
             <h3 class="mb-5 text-sm font-semibold text-slate-900">Tindakan / Perawatan</h3>
 
             @if ($canEdit)
@@ -328,7 +322,7 @@
         </div>
 
         {{-- Lampiran --}}
-        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <div data-tab-panel="lampiran" class="hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
             <h3 class="mb-5 text-sm font-semibold text-slate-900">Lampiran</h3>
 
             @if ($canEdit)
@@ -402,6 +396,39 @@
                     </div>
                 @empty
                     <div class="col-span-full py-6 text-center text-sm text-slate-400">Belum ada lampiran.</div>
+                @endforelse
+            </div>
+        </div>
+
+        {{-- Riwayat Kunjungan --}}
+        <div data-tab-panel="riwayat" class="hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+            <h3 class="mb-5 text-sm font-semibold text-slate-900">Riwayat Kunjungan</h3>
+
+            <div class="divide-y divide-slate-100">
+                @forelse ($visit->patient->visits()->with('doctor')->latest('visit_date')->get() as $historyVisit)
+                    <div class="flex flex-col gap-3 py-4 first:pt-0 last:pb-0 sm:flex-row sm:items-start sm:justify-between">
+                        <div class="min-w-0">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <p class="text-sm font-semibold text-slate-900">{{ $historyVisit->visit_date->translatedFormat('d F Y') }}</p>
+                                @if ($historyVisit->id === $visit->id)
+                                    <span class="rounded-md bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">Aktif</span>
+                                @endif
+                                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium {{ $historyVisit->status_badge_class }}">
+                                    {{ $historyVisit->status_label }}
+                                </span>
+                            </div>
+                            <p class="mt-1 text-xs text-slate-500">Dokter: {{ $historyVisit->doctor->name }}</p>
+                            <p class="mt-2 text-sm text-slate-700">{{ $historyVisit->complaint ?: 'Keluhan belum dicatat.' }}</p>
+                            @if ($historyVisit->diagnosis)
+                                <p class="mt-1 text-xs text-slate-500">Diagnosis: {{ $historyVisit->diagnosis }} @if($historyVisit->icd10_code)({{ $historyVisit->icd10_code }})@endif</p>
+                            @endif
+                        </div>
+                        <a href="{{ route('visits.show', $historyVisit) }}" class="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700">
+                            Detail <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+                @empty
+                    <p class="py-6 text-center text-sm text-slate-400">Belum ada riwayat kunjungan.</p>
                 @endforelse
             </div>
         </div>

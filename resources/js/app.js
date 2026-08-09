@@ -159,24 +159,84 @@ if (window.jQuery) jQuery(function ($) {
     });
 });
 
-// Odontogram: interactive FDI tooth grid + condition/surface modal (visits/show.blade.php).
+// Odontogram: interactive FDI tooth grid + inline editor (visits/show.blade.php).
 // Grid markup: partials/odontogram-grid.blade.php. Each tooth carries its current
-// state in data-condition / data-surfaces / data-notes so the modal can pre-fill on open.
+// state in data-condition / data-surfaces / data-notes so the editor can pre-fill on click.
 document.addEventListener('DOMContentLoaded', function () {
     const grid = document.querySelector('[data-odontogram-grid]');
-    const modal = document.getElementById('tooth-modal');
-    if (!grid || !modal || !window.jQuery) return;
+    if (!grid || !window.jQuery) return;
 
     const saveUrl = grid.dataset.saveUrl;
+    const inlineCondition = document.querySelector('[data-inline-condition]');
+    const inlineSurfaces = [...document.querySelectorAll('[data-inline-surface]')];
+    const inlineNotes = document.querySelector('[data-inline-notes]');
+    const inlineSave = document.querySelector('[data-inline-save]');
+    const inlineCancel = document.querySelector('[data-inline-cancel]');
+    const selectedLabel = document.querySelector('[data-selected-tooth-label]');
+    const selectedPreview = document.querySelector('[data-selected-tooth-preview]');
+    const modal = document.getElementById('tooth-modal');
     const numberEl = document.getElementById('tooth-modal-number');
     const notesEl = document.getElementById('tooth-modal-notes');
-    const conditionButtons = [...modal.querySelectorAll('[data-condition-option]')];
-    const surfaceButtons = [...modal.querySelectorAll('[data-surface-option]')];
+    const conditionButtons = modal ? [...modal.querySelectorAll('[data-condition-option]')] : [];
+    const surfaceButtons = modal ? [...modal.querySelectorAll('[data-surface-option]')] : [];
     const surfaceOrder = ['M', 'O', 'D', 'V', 'L'];
+    const conditionClassMap = {
+        'Normal': { tooth: 'odontogram-tooth--normal', dot: 'bg-white ring-1 ring-slate-300' },
+        'Karies': { tooth: 'odontogram-tooth--karies', dot: 'bg-red-500' },
+        'Tambalan': { tooth: 'odontogram-tooth--tambalan', dot: 'bg-blue-600' },
+        'Gigi Hilang': { tooth: 'odontogram-tooth--hilang', dot: 'bg-slate-500' },
+        'Perawatan Saluran Akar': { tooth: 'odontogram-tooth--akar', dot: 'bg-emerald-500' },
+        'Mahkota / Crown': { tooth: 'odontogram-tooth--crown', dot: 'bg-violet-500' },
+        'Gigi Patah': { tooth: 'odontogram-tooth--patah', dot: 'bg-orange-500' },
+        'Sisa Akar': { tooth: 'odontogram-tooth--sisa-akar', dot: 'bg-amber-800' },
+        'Belum Erupsi': { tooth: 'odontogram-tooth--belum-erupsi', dot: 'bg-rose-300' },
+        'Lainnya': { tooth: 'odontogram-tooth--lainnya', dot: 'bg-teal-500' },
+    };
+    const conditionAliases = {
+        'Fraktur': 'Gigi Patah',
+        'Crown': 'Mahkota / Crown',
+        'Un-erupted': 'Belum Erupsi',
+        'Partial Erupted': 'Belum Erupsi',
+        'Implant': 'Lainnya',
+        'Anomali': 'Lainnya',
+        'Non Vital': 'Lainnya',
+    };
 
     let currentToothEl = null;
     let selectedCondition = null;
     let selectedSurfaces = new Set();
+
+    function normalizeCondition(condition) {
+        return conditionAliases[condition] || condition || 'Normal';
+    }
+
+    function conditionClasses(condition) {
+        return conditionClassMap[normalizeCondition(condition)] || conditionClassMap.Lainnya;
+    }
+
+    function allToothStateClasses() {
+        return Object.values(conditionClassMap).map((item) => item.tooth);
+    }
+
+    function allDotClasses() {
+        return Object.values(conditionClassMap).flatMap((item) => item.dot.split(' '));
+    }
+
+    function paintTooth(toothEl, condition) {
+        const normalized = normalizeCondition(condition);
+        const hasCondition = normalized !== 'Normal';
+        const classes = conditionClasses(normalized);
+
+        toothEl.classList.remove(...allToothStateClasses());
+        toothEl.classList.add(classes.tooth);
+        toothEl.classList.toggle('is-marked', hasCondition);
+
+        const dot = toothEl.querySelector('.odontogram-tooth__spot');
+        if (dot) {
+            dot.classList.remove(...allDotClasses());
+            dot.classList.add(...classes.dot.split(' '));
+        }
+    }
 
     function paintOptionButton(btn, active) {
         btn.classList.toggle('bg-blue-600', active);
@@ -194,13 +254,33 @@ document.addEventListener('DOMContentLoaded', function () {
         surfaceButtons.forEach((btn) => paintOptionButton(btn, selectedSurfaces.has(btn.dataset.surfaceOption)));
     }
 
+    function fillInlineEditor(toothEl) {
+        currentToothEl = toothEl;
+        selectedCondition = normalizeCondition(toothEl.dataset.condition);
+        selectedSurfaces = new Set((toothEl.dataset.surfaces || '').split('').filter(Boolean));
+        selectedLabel && (selectedLabel.textContent = toothEl.dataset.toothNumber);
+
+        if (inlineCondition) inlineCondition.value = selectedCondition;
+        inlineSurfaces.forEach((input) => {
+            input.checked = selectedSurfaces.has(input.value);
+        });
+        if (inlineNotes) inlineNotes.value = toothEl.dataset.notes || '';
+        if (selectedPreview) paintTooth(selectedPreview, selectedCondition);
+    }
+
     function openModal(toothEl) {
+        if (inlineCondition && inlineNotes) {
+            fillInlineEditor(toothEl);
+            return;
+        }
+
+        if (!modal || !numberEl || !notesEl) return;
+
         currentToothEl = toothEl;
         numberEl.textContent = toothEl.dataset.toothNumber;
-        selectedCondition = toothEl.dataset.condition || null;
+        selectedCondition = normalizeCondition(toothEl.dataset.condition);
         selectedSurfaces = new Set((toothEl.dataset.surfaces || '').split('').filter(Boolean));
         notesEl.value = toothEl.dataset.notes || '';
-
         renderConditionButtons();
         renderSurfaceButtons();
         modal.classList.remove('hidden');
@@ -225,7 +305,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (tooth.has_condition) {
             if (!item) {
                 item = document.createElement('div');
-                item.className = 'py-2 text-sm';
+                item.className = 'rounded-lg border border-slate-200 px-3 py-2 text-sm';
                 item.dataset.notableItem = tooth.tooth_number;
                 item.innerHTML = `<span class="font-semibold text-slate-900">Gigi ${tooth.tooth_number}</span> `
                     + '<span class="text-slate-500" data-notable-text></span>'
@@ -255,9 +335,30 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    const firstTooth = grid.querySelector('[data-tooth-btn]');
+    if (firstTooth && inlineCondition && inlineNotes) {
+        const preferredTooth = grid.querySelector('[data-tooth-number="16"]') || firstTooth;
+        fillInlineEditor(preferredTooth);
+    }
+
+    inlineCondition?.addEventListener('change', () => {
+        selectedCondition = inlineCondition.value;
+        if (selectedPreview) paintTooth(selectedPreview, selectedCondition);
+    });
+
+    inlineSurfaces.forEach((input) => {
+        input.addEventListener('change', () => {
+            selectedSurfaces = new Set(inlineSurfaces.filter((surface) => surface.checked).map((surface) => surface.value));
+        });
+    });
+
+    inlineCancel?.addEventListener('click', () => {
+        if (currentToothEl) fillInlineEditor(currentToothEl);
+    });
+
     conditionButtons.forEach((btn) => {
         btn.addEventListener('click', () => {
-            selectedCondition = selectedCondition === btn.dataset.conditionOption ? null : btn.dataset.conditionOption;
+            selectedCondition = selectedCondition === btn.dataset.conditionOption ? 'Normal' : btn.dataset.conditionOption;
             renderConditionButtons();
         });
     });
@@ -276,11 +377,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.getElementById('tooth-modal-close')?.addEventListener('click', closeModal);
     document.getElementById('tooth-modal-cancel')?.addEventListener('click', closeModal);
-    modal.addEventListener('click', (event) => {
+    modal?.addEventListener('click', (event) => {
         if (event.target === modal) closeModal();
     });
 
-    document.getElementById('tooth-modal-save')?.addEventListener('click', function () {
+    function saveCurrentTooth() {
         if (!currentToothEl) return;
 
         const toothEl = currentToothEl;
@@ -288,7 +389,7 @@ document.addEventListener('DOMContentLoaded', function () {
             tooth_number: toothEl.dataset.toothNumber,
             condition: selectedCondition,
             surfaces: surfaceOrder.filter((s) => selectedSurfaces.has(s)),
-            notes: notesEl.value,
+            notes: inlineNotes ? inlineNotes.value : notesEl.value,
         };
 
         jQuery.post(saveUrl, payload)
@@ -299,17 +400,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 toothEl.dataset.notes = tooth.notes || '';
                 toothEl.title = tooth.condition ? tooth.condition + (tooth.surfaces ? ` (${tooth.surfaces})` : '') : 'Normal';
 
-                toothEl.classList.toggle('border-blue-300', tooth.has_condition);
-                toothEl.classList.toggle('bg-blue-50', tooth.has_condition);
-                toothEl.classList.toggle('text-blue-700', tooth.has_condition);
-                toothEl.classList.toggle('border-slate-200', !tooth.has_condition);
-                toothEl.classList.toggle('text-slate-500', !tooth.has_condition);
-
-                const dot = toothEl.querySelector('span:last-child');
-                if (dot) {
-                    dot.classList.toggle('bg-blue-500', tooth.has_condition);
-                    dot.classList.toggle('bg-transparent', !tooth.has_condition);
-                }
+                paintTooth(toothEl, tooth.condition);
+                if (selectedPreview) paintTooth(selectedPreview, tooth.condition);
 
                 syncNotableList(tooth);
                 closeModal();
@@ -321,5 +413,11 @@ document.addEventListener('DOMContentLoaded', function () {
             .fail(function (xhr) {
                 Swal.fire('Gagal', xhr.responseJSON?.message || 'Gagal menyimpan kondisi gigi.', 'error');
             });
+    }
+
+    inlineSave?.addEventListener('click', saveCurrentTooth);
+
+    document.getElementById('tooth-modal-save')?.addEventListener('click', function () {
+        saveCurrentTooth();
     });
 });
