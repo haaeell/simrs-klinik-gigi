@@ -8,6 +8,7 @@ use App\Models\Treatment;
 use App\Models\User;
 use App\Models\Visit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class ReportController extends Controller
 {
@@ -43,8 +44,9 @@ class ReportController extends Controller
         ];
 
         $doctors = User::where('role', 'dokter')->orderBy('name')->get();
+        $dailyVisits = $this->dailyCounts($visits, fn ($visit) => $visit->visit_date, $start, $end);
 
-        return view('reports.visits', compact('visits', 'summary', 'doctors', 'start', 'end', 'doctorId'));
+        return view('reports.visits', compact('visits', 'summary', 'doctors', 'start', 'end', 'doctorId', 'dailyVisits'));
     }
 
     public function queues(Request $request)
@@ -63,7 +65,9 @@ class ReportController extends Controller
             'skipped' => $queues->where('status', 'skipped')->count(),
         ];
 
-        return view('reports.queues', compact('queues', 'summary', 'start', 'end'));
+        $dailyQueues = $this->dailyCounts($queues, fn ($queue) => $queue->queue_date, $start, $end);
+
+        return view('reports.queues', compact('queues', 'summary', 'start', 'end', 'dailyQueues'));
     }
 
     public function patients(Request $request)
@@ -108,7 +112,12 @@ class ReportController extends Controller
 
         $doctors = User::where('role', 'dokter')->orderBy('name')->get();
 
-        return view('reports.treatments', compact('treatments', 'doctors', 'start', 'end', 'doctorId', 'keyword'));
+        $topTreatments = $treatments->groupBy('treatment')
+            ->map->count()
+            ->sortDesc()
+            ->take(8);
+
+        return view('reports.treatments', compact('treatments', 'doctors', 'start', 'end', 'doctorId', 'keyword', 'topTreatments'));
     }
 
     public function serviceTime(Request $request)
@@ -126,10 +135,12 @@ class ReportController extends Controller
             ->get();
 
         $waitMinutes = $queues->filter(fn ($q) => $q->called_at)
-            ->map(fn ($q) => $q->created_at->diffInMinutes($q->called_at));
+            ->map(fn ($q) => $q->created_at->diffInMinutes($q->called_at))
+            ->filter(fn ($minutes) => $minutes >= 0);
 
         $examinationMinutes = $queues->filter(fn ($q) => $q->started_at && $q->finished_at)
-            ->map(fn ($q) => $q->started_at->diffInMinutes($q->finished_at));
+            ->map(fn ($q) => $q->started_at->diffInMinutes($q->finished_at))
+            ->filter(fn ($minutes) => $minutes >= 0);
 
         $sourceCounts = collect(Queue::SOURCES)->keys()
             ->mapWithKeys(fn ($key) => [$key => $queues->where('registration_source', $key)->count()]);
@@ -143,7 +154,25 @@ class ReportController extends Controller
 
         $doctors = User::where('role', 'dokter')->orderBy('name')->get();
 
-        return view('reports.service-time', compact('queues', 'summary', 'doctors', 'start', 'end', 'doctorId', 'source'));
+        $dailyServiceTime = $queues->groupBy(fn ($queue) => $queue->queue_date->format('Y-m-d'))
+            ->map(function ($dayQueues) {
+                $wait = $dayQueues->filter(fn ($q) => $q->called_at)->map(fn ($q) => $q->created_at->diffInMinutes($q->called_at))->filter(fn ($m) => $m >= 0);
+                $exam = $dayQueues->filter(fn ($q) => $q->started_at && $q->finished_at)->map(fn ($q) => $q->started_at->diffInMinutes($q->finished_at))->filter(fn ($m) => $m >= 0);
+
+                return [
+                    'wait' => $wait->isEmpty() ? 0 : (int) round($wait->avg()),
+                    'examination' => $exam->isEmpty() ? 0 : (int) round($exam->avg()),
+                ];
+            });
+
+        $dailyServiceTime = collect(Carbon::parse($start)->daysUntil(Carbon::parse($end)))
+            ->map(fn ($date) => [
+                'label' => $date->translatedFormat('d M'),
+                'wait' => $dailyServiceTime[$date->format('Y-m-d')]['wait'] ?? 0,
+                'examination' => $dailyServiceTime[$date->format('Y-m-d')]['examination'] ?? 0,
+            ]);
+
+        return view('reports.service-time', compact('queues', 'summary', 'doctors', 'start', 'end', 'doctorId', 'source', 'dailyServiceTime'));
     }
 
     private function dateRange(Request $request): array
@@ -152,5 +181,20 @@ class ReportController extends Controller
         $end = $request->input('end_date') ?: now()->toDateString();
 
         return [$start, $end];
+    }
+
+    /**
+     * Day-by-day totals for a bar chart — every day in [start, end] shows up (0 if empty),
+     * built once here so each report's chart uses the same fill-the-gaps logic.
+     */
+    private function dailyCounts($items, \Closure $dateAccessor, string $start, string $end)
+    {
+        $byDate = $items->groupBy(fn ($item) => $dateAccessor($item)->format('Y-m-d'))->map->count();
+
+        return collect(Carbon::parse($start)->daysUntil(Carbon::parse($end)))
+            ->map(fn ($date) => [
+                'label' => $date->translatedFormat('d M'),
+                'total' => $byDate[$date->format('Y-m-d')] ?? 0,
+            ]);
     }
 }

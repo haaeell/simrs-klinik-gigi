@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ControlScheduleController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DisplaySettingController;
 use App\Http\Controllers\OdontogramController;
@@ -75,6 +76,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/reports/patients', [ReportController::class, 'patients'])->name('reports.patients');
         Route::get('/reports/treatments', [ReportController::class, 'treatments'])->name('reports.treatments');
         Route::get('/reports/service-time', [ReportController::class, 'serviceTime'])->name('reports.service-time');
+
+        Route::get('/control-schedules', [ControlScheduleController::class, 'index'])->name('control-schedules.index');
+        Route::put('/control-schedules/{controlSchedule}', [ControlScheduleController::class, 'update'])->name('control-schedules.update');
 
         Route::middleware('role:admin')->group(function () {
             Route::resource('users', UserController::class)->except(['show']);

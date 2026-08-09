@@ -194,7 +194,7 @@ if (window.jQuery) jQuery(function ($) {
                     text: 'Antrean ' + $btn.data('queueNumber'),
                     input: 'select',
                     inputOptions: rooms.reduce(function (opts, room) {
-                        opts[room.id] = room.name + ' — ' + room.doctor_name;
+                        opts[room.id] = room.name + ' — ' + room.doctor_name + ' (' + room.status + ')';
                         return opts;
                     }, {}),
                     inputPlaceholder: 'Pilih ruangan',

@@ -89,6 +89,59 @@
             </div>
         </div>
 
+        <div class="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-3">
+            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-2">
+                <h3 class="mb-4 text-sm font-semibold text-slate-900">Tren Kunjungan 7 Hari Terakhir</h3>
+                <div class="h-64">
+                    <canvas id="chart-visit-trend"></canvas>
+                </div>
+            </div>
+            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <h3 class="mb-4 text-sm font-semibold text-slate-900">Sumber Pendaftaran Hari Ini</h3>
+                <div class="h-64">
+                    <canvas id="chart-source"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            new Chart(document.getElementById('chart-visit-trend'), {
+                type: 'bar',
+                data: {
+                    labels: @json($visitTrend->pluck('label')),
+                    datasets: [{
+                        label: 'Antrean',
+                        data: @json($visitTrend->pluck('total')),
+                        backgroundColor: '#2563eb',
+                        borderRadius: 6,
+                        maxBarThickness: 40,
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+                },
+            });
+
+            new Chart(document.getElementById('chart-source'), {
+                type: 'doughnut',
+                data: {
+                    labels: @json(collect(\App\Models\Queue::SOURCES)->values()),
+                    datasets: [{
+                        data: @json(collect(\App\Models\Queue::SOURCES)->keys()->map(fn ($key) => $sourceCounts[$key])),
+                        backgroundColor: ['#2563eb', '#7c3aed', '#64748b'],
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } },
+                },
+            });
+        </script>
+
         <div class="mt-8">
             <div class="mb-4 flex items-center justify-between">
                 <h3 class="text-sm font-semibold text-slate-900">Antrean Hari Ini</h3>

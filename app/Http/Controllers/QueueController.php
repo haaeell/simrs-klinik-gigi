@@ -25,7 +25,7 @@ class QueueController extends Controller
 
         // Computed once and reused per-row in the view — the average is the same for every queue today.
         $avgExaminationMinutes = Queue::averageExaminationMinutes();
-        $activeRooms = Room::active();
+        $activeRooms = Room::activeWithSchedules();
 
         return view('queues.index', [
             'queues' => $queues,
@@ -48,7 +48,7 @@ class QueueController extends Controller
             return redirect()->route('patients.show', $patient)->with('error', 'Pasien ini sudah memiliki antrean aktif hari ini.');
         }
 
-        $activeRooms = Room::active();
+        $activeRooms = Room::activeWithSchedules();
 
         return view('queues.create', compact('patient', 'activeRooms'));
     }

@@ -49,7 +49,7 @@
                                 <option value="">(Belum tahu / bebas)</option>
                                 @foreach ($activeRooms as $room)
                                     <option value="{{ $room->id }}" {{ old('room_id') == $room->id ? 'selected' : '' }}>
-                                        {{ $room->doctor->name }} &mdash; {{ $room->name }}
+                                        {{ $room->doctor->name }} &mdash; {{ $room->name }} ({{ $room->todayStatusLabel() }})
                                     </option>
                                 @endforeach
                             </select>

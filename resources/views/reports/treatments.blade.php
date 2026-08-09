@@ -52,6 +52,37 @@
 
     <p class="mb-4 text-sm text-slate-500">Total tindakan: <span class="font-semibold text-slate-900">{{ $treatments->count() }}</span></p>
 
+    <div class="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm print:hidden">
+        <h3 class="mb-4 text-sm font-semibold text-slate-900">Tindakan Terbanyak</h3>
+        <div class="h-64">
+            <canvas id="chart-top-treatments"></canvas>
+        </div>
+    </div>
+    @if ($topTreatments->isNotEmpty())
+        <script>
+            new Chart(document.getElementById('chart-top-treatments'), {
+                type: 'bar',
+                data: {
+                    labels: @json($topTreatments->keys()),
+                    datasets: [{
+                        label: 'Jumlah',
+                        data: @json($topTreatments->values()),
+                        backgroundColor: '#2563eb',
+                        borderRadius: 6,
+                        maxBarThickness: 40,
+                    }],
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
+                },
+            });
+        </script>
+    @endif
+
     <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm print:border-0 print:shadow-none">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">

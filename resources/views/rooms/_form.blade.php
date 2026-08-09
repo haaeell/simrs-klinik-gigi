@@ -1,5 +1,6 @@
 @php
     $room = $room ?? null;
+    $schedulesByDay = $room?->schedules->keyBy('day_of_week') ?? collect();
 @endphp
 
 <div class="grid grid-cols-1 gap-5">
@@ -32,4 +33,51 @@
             class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-200">
         Aktif (tampil sebagai pilihan saat memanggil antrean)
     </label>
+
+    <div>
+        <p class="mb-1.5 block text-sm font-medium text-slate-700">Jadwal Praktik</p>
+        <p class="mb-3 text-xs text-slate-400">
+            Centang hari dokter praktik beserta jam mulai/selesai. Hari yang tidak dicentang akan ditandai "tidak praktik" saat pasien atau petugas memilih dokter ini.
+        </p>
+        <div class="space-y-2 rounded-xl border border-slate-200 p-3">
+            @foreach (\App\Models\RoomSchedule::DAYS as $day => $label)
+                @php
+                    $schedule = $schedulesByDay->get($day);
+                    $enabled = old("schedule.$day.enabled", $schedule ? '1' : null);
+                @endphp
+                <div class="flex flex-wrap items-center gap-3" data-schedule-day>
+                    <label class="flex w-28 shrink-0 items-center gap-2 text-sm text-slate-700">
+                        <input type="checkbox" name="schedule[{{ $day }}][enabled]" value="1" {{ $enabled ? 'checked' : '' }}
+                            data-schedule-toggle class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-200">
+                        {{ $label }}
+                    </label>
+                    <input type="time" name="schedule[{{ $day }}][start_time]"
+                        value="{{ old("schedule.$day.start_time", $schedule?->start_time?->format('H:i') ?? '08:00') }}"
+                        data-schedule-time {{ $enabled ? '' : 'disabled' }}
+                        class="rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                    <span class="text-xs text-slate-400">s/d</span>
+                    <input type="time" name="schedule[{{ $day }}][end_time]"
+                        value="{{ old("schedule.$day.end_time", $schedule?->end_time?->format('H:i') ?? '16:00') }}"
+                        data-schedule-time {{ $enabled ? '' : 'disabled' }}
+                        class="rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                    @error("schedule.$day.start_time")
+                        <p class="w-full text-xs text-red-600">{{ $message }}</p>
+                    @enderror
+                    @error("schedule.$day.end_time")
+                        <p class="w-full text-xs text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+            @endforeach
+        </div>
+    </div>
 </div>
+
+<script>
+    document.querySelectorAll('[data-schedule-day]').forEach(function (row) {
+        const toggle = row.querySelector('[data-schedule-toggle]');
+        const timeInputs = row.querySelectorAll('[data-schedule-time]');
+        toggle?.addEventListener('change', function () {
+            timeInputs.forEach((input) => input.disabled = !toggle.checked);
+        });
+    });
+</script>

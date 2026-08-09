@@ -81,7 +81,13 @@
       "Bash(composer show *)",
       "Bash(node test-qrdisplay.js)",
       "Bash(grep -A3 \"checkin-qr\\\\\"\\), {\")",
-      "Bash(curl -s -b /tmp/claude-guest.jar -c /tmp/claude-guest.jar -o /dev/null -w 'guest -> /check-in: %{http_code} redirect_to=%{redirect_url}\\\\n' http://127.0.0.1:8123/check-in)"
+      "Bash(curl -s -b /tmp/claude-guest.jar -c /tmp/claude-guest.jar -o /dev/null -w 'guest -> /check-in: %{http_code} redirect_to=%{redirect_url}\\\\n' http://127.0.0.1:8123/check-in)",
+      "Bash(grep -n 'activeRooms as $room' resources/views/queues/create.blade.php resources/views/patient/queue.blade.php resources/views/patient/check-in.blade.php)",
+      "Bash(grep -n 'foreach \\($activeRooms' resources/views/queues/create.blade.php resources/views/patient/queue.blade.php resources/views/patient/check-in.blade.php)",
+      "Bash(node test-schedule.js)",
+      "Bash(curl -s -b /tmp/claude-admin.jar http://127.0.0.1:8123/control-schedules)",
+      "Bash(node test-charts.js)",
+      "Bash(node test-cs-action.js)"
     ],
     "additionalDirectories": [
       "/Users/user/JOKI/SKRIPSI/SIROJUDDIN TI/klinik-gigi/storage/app/public/attachments",

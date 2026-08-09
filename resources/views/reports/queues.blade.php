@@ -51,6 +51,34 @@
         </div>
     </div>
 
+    <div class="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm print:hidden">
+        <h3 class="mb-4 text-sm font-semibold text-slate-900">Antrean per Hari</h3>
+        <div class="h-64">
+            <canvas id="chart-daily-queues"></canvas>
+        </div>
+    </div>
+    <script>
+        new Chart(document.getElementById('chart-daily-queues'), {
+            type: 'bar',
+            data: {
+                labels: @json($dailyQueues->pluck('label')),
+                datasets: [{
+                    label: 'Antrean',
+                    data: @json($dailyQueues->pluck('total')),
+                    backgroundColor: '#2563eb',
+                    borderRadius: 6,
+                    maxBarThickness: 40,
+                }],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+            },
+        });
+    </script>
+
     <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm print:border-0 print:shadow-none">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">

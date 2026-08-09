@@ -55,7 +55,7 @@ class PatientPortalController extends Controller
     {
         $patient = $request->user()->patient;
         $activeQueue = Queue::activeToday($patient->id);
-        $activeRooms = Room::active();
+        $activeRooms = Room::activeWithSchedules();
 
         return view('patient.queue', compact('patient', 'activeQueue', 'activeRooms'));
     }
@@ -94,7 +94,7 @@ class PatientPortalController extends Controller
     {
         $patient = $request->user()->patient;
         $activeQueue = Queue::activeToday($patient->id);
-        $activeRooms = Room::active();
+        $activeRooms = Room::activeWithSchedules();
 
         return view('patient.check-in', compact('patient', 'activeQueue', 'activeRooms'));
     }

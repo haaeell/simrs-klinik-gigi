@@ -157,7 +157,15 @@
         </div>
     </div>
 
+    @php
+        $activeRoomsForJs = $activeRooms->map(fn ($room) => [
+            'id' => $room->id,
+            'name' => $room->name,
+            'doctor_name' => $room->doctor->name,
+            'status' => $room->todayStatusLabel(),
+        ]);
+    @endphp
     <script>
-        window.activeRooms = @json($activeRooms->map(fn ($room) => ['id' => $room->id, 'name' => $room->name, 'doctor_name' => $room->doctor->name]));
+        window.activeRooms = @json($activeRoomsForJs);
     </script>
 @endsection

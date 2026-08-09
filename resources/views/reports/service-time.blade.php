@@ -77,6 +77,43 @@
         </div>
     </div>
 
+    <div class="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm print:hidden">
+        <h3 class="mb-4 text-sm font-semibold text-slate-900">Rata-rata Waktu Tunggu &amp; Durasi Pemeriksaan per Hari</h3>
+        <div class="h-64">
+            <canvas id="chart-service-time"></canvas>
+        </div>
+    </div>
+    <script>
+        new Chart(document.getElementById('chart-service-time'), {
+            type: 'line',
+            data: {
+                labels: @json($dailyServiceTime->pluck('label')),
+                datasets: [
+                    {
+                        label: 'Waktu Tunggu (menit)',
+                        data: @json($dailyServiceTime->pluck('wait')),
+                        borderColor: '#2563eb',
+                        backgroundColor: '#2563eb',
+                        tension: 0.3,
+                    },
+                    {
+                        label: 'Durasi Pemeriksaan (menit)',
+                        data: @json($dailyServiceTime->pluck('examination')),
+                        borderColor: '#7c3aed',
+                        backgroundColor: '#7c3aed',
+                        tension: 0.3,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom' } },
+                scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+            },
+        });
+    </script>
+
     <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm print:border-0 print:shadow-none">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
@@ -107,8 +144,8 @@
                             <td class="px-5 py-3 text-slate-500">{{ $queue->created_at->format('H:i') }}</td>
                             <td class="px-5 py-3 text-slate-500">{{ $queue->started_at?->format('H:i') ?? '-' }}</td>
                             <td class="px-5 py-3 text-slate-500">{{ $queue->finished_at?->format('H:i') ?? '-' }}</td>
-                            <td class="px-5 py-3 text-slate-500">{{ $queue->called_at ? $queue->created_at->diffInMinutes($queue->called_at) . ' menit' : '-' }}</td>
-                            <td class="px-5 py-3 text-slate-500">{{ $queue->started_at && $queue->finished_at ? $queue->started_at->diffInMinutes($queue->finished_at) . ' menit' : '-' }}</td>
+                            <td class="px-5 py-3 text-slate-500">{{ $queue->called_at ? max(0, (int) round($queue->created_at->diffInMinutes($queue->called_at))) . ' menit' : '-' }}</td>
+                            <td class="px-5 py-3 text-slate-500">{{ $queue->started_at && $queue->finished_at ? max(0, (int) round($queue->started_at->diffInMinutes($queue->finished_at))) . ' menit' : '-' }}</td>
                         </tr>
                     @empty
                         <tr>

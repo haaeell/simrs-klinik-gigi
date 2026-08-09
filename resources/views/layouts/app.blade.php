@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -57,6 +58,7 @@
                         ['label' => $user->isAdmin() ? 'Antrean' : 'Antrean Pasien', 'icon' => 'fa-list-ol', 'route' => 'queues.index'],
                         ['label' => 'Pasien', 'icon' => 'fa-users', 'route' => 'patients.index'],
                         ['label' => 'Rekam Medis', 'icon' => 'fa-notes-medical', 'route' => 'visits.index'],
+                        ['label' => 'Jadwal Kontrol', 'icon' => 'fa-calendar-check', 'route' => 'control-schedules.index'],
                         ['label' => 'Laporan', 'icon' => 'fa-chart-line', 'route' => 'reports.visits'],
                         ['label' => 'Pengguna', 'icon' => 'fa-user-doctor', 'route' => 'users.index', 'adminOnly' => true],
                         ['label' => 'Ruangan', 'icon' => 'fa-door-open', 'route' => 'rooms.index', 'adminOnly' => true],

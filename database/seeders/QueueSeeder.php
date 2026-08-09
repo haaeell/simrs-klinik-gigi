@@ -40,17 +40,28 @@ class QueueSeeder extends Seeder
             // that still applies to online/QR self check-ins.
             $room = ($rooms->isNotEmpty() && $i !== 3) ? $rooms[$i % $rooms->count()] : null;
 
-            Queue::create([
+            // Build a chronologically consistent timeline (registered -> called -> started ->
+            // finished), each step strictly after the previous one, so wait/duration reports
+            // never end up with a negative "waktu tunggu" like an earlier version of this seeder did.
+            $createdAt = now()->subMinutes(rand(45, 90));
+            $calledAt = in_array($status, ['called', 'examining', 'done'], true) ? $createdAt->copy()->addMinutes(rand(5, 20)) : null;
+            $startedAt = in_array($status, ['examining', 'done'], true) ? $calledAt->copy()->addMinutes(rand(1, 5)) : null;
+            $finishedAt = $status === 'done' ? $startedAt->copy()->addMinutes(rand(10, 25)) : null;
+
+            $queue = Queue::create([
                 'patient_id' => $patient->id,
                 'queue_number' => 'A-'.str_pad((string) ($i + 1), 3, '0', STR_PAD_LEFT),
                 'queue_date' => $today,
                 'status' => $status,
                 'room_id' => $room?->id,
                 'complaint' => $this->complaints[$i] ?? null,
-                'called_at' => in_array($status, ['called', 'examining', 'done'], true) ? now()->subMinutes(rand(20, 40)) : null,
-                'started_at' => in_array($status, ['examining', 'done'], true) ? now()->subMinutes(rand(5, 19)) : null,
-                'finished_at' => $status === 'done' ? now()->subMinutes(rand(1, 4)) : null,
+                'called_at' => $calledAt,
+                'started_at' => $startedAt,
+                'finished_at' => $finishedAt,
             ]);
+
+            $queue->timestamps = false;
+            $queue->forceFill(['created_at' => $createdAt, 'updated_at' => $finishedAt ?? $startedAt ?? $calledAt ?? $createdAt])->save();
         }
     }
 }

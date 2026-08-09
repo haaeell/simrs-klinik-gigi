@@ -20,6 +20,7 @@
                     <tr>
                         <th class="px-5 py-3 font-medium">Ruangan</th>
                         <th class="px-5 py-3 font-medium">Dokter</th>
+                        <th class="px-5 py-3 font-medium">Jadwal Praktik</th>
                         <th class="px-5 py-3 font-medium">Status</th>
                         <th class="px-5 py-3 font-medium text-right">Aksi</th>
                     </tr>
@@ -33,6 +34,19 @@
                                     <span class="inline-flex items-center gap-1.5"><i class="fa-solid fa-user-doctor text-slate-400"></i> {{ $room->doctor->name }}</span>
                                 @else
                                     <span class="text-slate-400">Belum ditentukan</span>
+                                @endif
+                            </td>
+                            <td class="px-5 py-3.5 text-slate-500">
+                                @if ($room->schedules->isEmpty())
+                                    <span class="text-slate-400">Belum diatur</span>
+                                @else
+                                    <div class="flex flex-wrap gap-1">
+                                        @foreach ($room->schedules->sortBy('day_of_week') as $schedule)
+                                            <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
+                                                {{ substr(\App\Models\RoomSchedule::DAYS[$schedule->day_of_week], 0, 3) }} {{ $schedule->start_time->format('H:i') }}-{{ $schedule->end_time->format('H:i') }}
+                                            </span>
+                                        @endforeach
+                                    </div>
                                 @endif
                             </td>
                             <td class="px-5 py-3.5">
@@ -63,7 +77,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="px-5 py-16 text-center">
+                            <td colspan="5" class="px-5 py-16 text-center">
                                 <i class="fa-solid fa-door-open mb-3 block text-3xl text-slate-300"></i>
                                 <p class="text-sm font-medium text-slate-500">Belum ada ruangan.</p>
                                 <p class="mt-1 text-xs text-slate-400">Tanpa ruangan, pemanggilan antrean tetap berjalan seperti biasa (satu nomor panggilan umum).</p>

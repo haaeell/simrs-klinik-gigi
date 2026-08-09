@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Room;
+use App\Models\RoomSchedule;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -11,7 +12,7 @@ class RoomController extends Controller
 {
     public function index()
     {
-        $rooms = Room::with('doctor')->orderBy('name')->get();
+        $rooms = Room::with(['doctor', 'schedules'])->orderBy('name')->get();
 
         return view('rooms.index', compact('rooms'));
     }
@@ -27,7 +28,8 @@ class RoomController extends Controller
     {
         $validated = $this->validateRoom($request);
 
-        Room::create($validated);
+        $room = Room::create($validated);
+        $this->syncSchedules($room, $request);
 
         return redirect()->route('rooms.index')->with('success', 'Ruangan berhasil ditambahkan.');
     }
@@ -35,6 +37,7 @@ class RoomController extends Controller
     public function edit(Room $room)
     {
         $doctors = $this->availableDoctors($room);
+        $room->load('schedules');
 
         return view('rooms.edit', compact('room', 'doctors'));
     }
@@ -44,6 +47,7 @@ class RoomController extends Controller
         $validated = $this->validateRoom($request, $room);
 
         $room->update($validated);
+        $this->syncSchedules($room, $request);
 
         return redirect()->route('rooms.index')->with('success', 'Data ruangan berhasil diperbarui.');
     }
@@ -84,5 +88,35 @@ class RoomController extends Controller
         $validated['is_active'] = $request->boolean('is_active');
 
         return $validated;
+    }
+
+    /**
+     * Replace the room's weekly schedule from the "schedule[{day}][enabled|start_time|end_time]"
+     * form fields — one row per day of week (0=Minggu..6=Sabtu), unchecked days are removed.
+     */
+    private function syncSchedules(Room $room, Request $request): void
+    {
+        $input = $request->input('schedule', []);
+
+        foreach (RoomSchedule::DAYS as $day => $label) {
+            $day = (int) $day;
+            $enabled = ! empty($input[$day]['enabled'] ?? null);
+
+            if (! $enabled) {
+                $room->schedules()->where('day_of_week', $day)->delete();
+
+                continue;
+            }
+
+            $request->validate([
+                "schedule.$day.start_time" => ['required', 'date_format:H:i'],
+                "schedule.$day.end_time" => ['required', 'date_format:H:i', "after:schedule.$day.start_time"],
+            ], [], ["schedule.$day.start_time" => "jam mulai $label", "schedule.$day.end_time" => "jam selesai $label"]);
+
+            $room->schedules()->updateOrCreate(
+                ['day_of_week' => $day],
+                ['start_time' => $input[$day]['start_time'], 'end_time' => $input[$day]['end_time']],
+            );
+        }
     }
 }
