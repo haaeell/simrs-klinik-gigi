@@ -34,6 +34,30 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // Notification bell dropdown (patient portal)
+    const notifMenuButton = document.getElementById('notif-menu-button');
+    const notifMenu = document.getElementById('notif-menu');
+
+    notifMenuButton?.addEventListener('click', function (event) {
+        event.stopPropagation();
+        notifMenu?.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', function (event) {
+        if (notifMenu && !notifMenu.classList.contains('hidden') && !notifMenu.contains(event.target)) {
+            notifMenu.classList.add('hidden');
+        }
+    });
+
+    // "Perlu Kontrol?" checkbox toggle on the doctor exam form.
+    document.querySelectorAll('[data-control-toggle]').forEach(function (wrapper) {
+        const checkbox = wrapper.querySelector('[data-control-checkbox]');
+        const fields = wrapper.querySelector('[data-control-fields]');
+        checkbox?.addEventListener('change', function () {
+            fields?.classList.toggle('hidden', !checkbox.checked);
+        });
+    });
+
     // Generic tab switcher. Usage:
     // <div data-tabs> <button data-tab-target="key"> ... <div data-tab-panel="key">
     // Deep-links via ?tab=key so redirects (e.g. after a form save) can land on the right tab.

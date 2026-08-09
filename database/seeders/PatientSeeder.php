@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Patient;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class PatientSeeder extends Seeder
@@ -35,6 +36,17 @@ class PatientSeeder extends Seeder
                     'hepatitis' => fake()->boolean(5),
                     'drug_allergy' => fake()->boolean(20) ? 'Amoxicillin' : null,
                     'food_allergy' => fake()->boolean(15) ? 'Seafood' : null,
+                ]);
+            }
+
+            // Give the first patient a ready-made portal login for demo/testing.
+            if ($i === 1) {
+                User::create([
+                    'name' => $patient->name,
+                    'email' => 'pasien@example.com',
+                    'password' => 'password',
+                    'role' => 'pasien',
+                    'patient_id' => $patient->id,
                 ]);
             }
         }

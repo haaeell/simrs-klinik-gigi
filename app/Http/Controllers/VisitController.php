@@ -29,7 +29,7 @@ class VisitController extends Controller
 
     public function show(Visit $visit)
     {
-        $visit->load(['patient.medicalHistory', 'doctor', 'treatments', 'odontogram.teeth', 'attachments']);
+        $visit->load(['patient.medicalHistory', 'doctor', 'treatments', 'odontogram.teeth', 'attachments', 'controlSchedule']);
 
         $canEdit = auth()->user()->isDokter() && $visit->status === 'examining';
 
@@ -45,9 +45,29 @@ class VisitController extends Controller
             'diagnosis' => ['nullable', 'string', 'max:255'],
             'icd10_code' => ['nullable', 'string', 'max:20'],
             'notes' => ['nullable', 'string'],
+            'needs_control' => ['nullable', 'boolean'],
+            'control_date' => ['required_if:needs_control,1', 'nullable', 'date', 'after_or_equal:today'],
+            'control_notes' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        $visit->update($validated);
+        $visit->update([
+            'complaint' => $validated['complaint'] ?? null,
+            'diagnosis' => $validated['diagnosis'] ?? null,
+            'icd10_code' => $validated['icd10_code'] ?? null,
+            'notes' => $validated['notes'] ?? null,
+        ]);
+
+        if (! empty($validated['needs_control'])) {
+            $visit->controlSchedule()->updateOrCreate([], [
+                'patient_id' => $visit->patient_id,
+                'doctor_id' => auth()->id(),
+                'control_date' => $validated['control_date'],
+                'notes' => $validated['control_notes'] ?? null,
+                'status' => 'scheduled',
+            ]);
+        } else {
+            $visit->controlSchedule()->delete();
+        }
 
         return back()->with('success', 'Data pemeriksaan berhasil disimpan.');
     }

@@ -39,7 +39,7 @@ class PatientController extends Controller
         $validated = $this->validatePatient($request);
 
         $patient = DB::transaction(function () use ($validated) {
-            $validated['medical_record_number'] = $this->generateMedicalRecordNumber();
+            $validated['medical_record_number'] = Patient::generateNextMedicalRecordNumber();
 
             return Patient::create($validated);
         });
@@ -116,11 +116,4 @@ class PatientController extends Controller
         ]);
     }
 
-    private function generateMedicalRecordNumber(): string
-    {
-        $last = Patient::lockForUpdate()->orderByDesc('id')->first();
-        $next = $last ? ((int) substr($last->medical_record_number, 3)) + 1 : 1;
-
-        return 'RM-'.str_pad((string) $next, 6, '0', STR_PAD_LEFT);
-    }
 }

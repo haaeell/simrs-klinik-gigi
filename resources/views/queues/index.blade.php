@@ -48,6 +48,8 @@
                         <th class="px-5 py-3 font-medium">Nomor Antrean</th>
                         <th class="px-5 py-3 font-medium">Pasien</th>
                         <th class="px-5 py-3 font-medium">No RM</th>
+                        <th class="px-5 py-3 font-medium">Sumber</th>
+                        <th class="px-5 py-3 font-medium">Estimasi Tunggu</th>
                         <th class="px-5 py-3 font-medium">Jam Daftar</th>
                         <th class="px-5 py-3 font-medium">Status</th>
                         <th class="px-5 py-3 font-medium text-right">Aksi</th>
@@ -63,6 +65,14 @@
                                 </a>
                             </td>
                             <td class="px-5 py-3.5 font-mono text-xs text-slate-500">{{ $queue->patient->medical_record_number }}</td>
+                            <td class="px-5 py-3.5">
+                                <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium {{ $queue->source_badge_class }}">
+                                    {{ $queue->source_label }}
+                                </span>
+                            </td>
+                            <td class="px-5 py-3.5 text-slate-500">
+                                {{ $queue->status === 'waiting' ? '±'.($queue->patientsAhead() * $avgExaminationMinutes).' menit' : '-' }}
+                            </td>
                             <td class="px-5 py-3.5 text-slate-500">{{ $queue->created_at->format('H:i') }}</td>
                             <td class="px-5 py-3.5">
                                 <span data-status-badge class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium {{ $queue->status_badge_class }}">
@@ -113,7 +123,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-5 py-16 text-center">
+                            <td colspan="8" class="px-5 py-16 text-center">
                                 <i class="fa-solid fa-list-ol mb-3 block text-3xl text-slate-300"></i>
                                 <p class="text-sm font-medium text-slate-500">Belum ada antrean hari ini.</p>
                                 <a href="{{ route('patients.index') }}" class="mt-3 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">

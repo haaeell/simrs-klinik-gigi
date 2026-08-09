@@ -64,6 +64,24 @@ class OdontogramController extends Controller
         ]);
     }
 
+    public function compare(Visit $visit)
+    {
+        $current = $visit->odontogram()->with('teeth')->first();
+        abort_unless($current, 404, 'Kunjungan ini belum memiliki data odontogram.');
+
+        $previous = Odontogram::where('patient_id', $visit->patient_id)
+            ->where('id', '!=', $current->id)
+            ->where('examination_date', '<', $current->examination_date)
+            ->with(['teeth', 'doctor'])
+            ->latest('examination_date')
+            ->latest('id')
+            ->first();
+
+        $changes = Odontogram::diffTeeth($current, $previous);
+
+        return view('visits.odontogram-compare', compact('visit', 'current', 'previous', 'changes'));
+    }
+
     private function odontogramFor(Visit $visit): Odontogram
     {
         return $visit->odontogram()->firstOrCreate([], [

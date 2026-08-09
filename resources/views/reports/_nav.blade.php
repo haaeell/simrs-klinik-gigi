@@ -4,6 +4,7 @@
         ['route' => 'reports.queues', 'label' => 'Antrean', 'icon' => 'fa-list-ol'],
         ['route' => 'reports.patients', 'label' => 'Pasien', 'icon' => 'fa-users'],
         ['route' => 'reports.treatments', 'label' => 'Tindakan', 'icon' => 'fa-notes-medical'],
+        ['route' => 'reports.service-time', 'label' => 'Waktu Pelayanan', 'icon' => 'fa-clock'],
     ];
 @endphp
 

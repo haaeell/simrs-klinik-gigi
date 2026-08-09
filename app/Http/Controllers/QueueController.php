@@ -20,9 +20,13 @@ class QueueController extends Controller
 
         $counts = $this->countByStatus($queues);
 
+        // Computed once and reused per-row in the view — the average is the same for every queue today.
+        $avgExaminationMinutes = Queue::averageExaminationMinutes();
+
         return view('queues.index', [
             'queues' => $queues,
             'counts' => $counts,
+            'avgExaminationMinutes' => $avgExaminationMinutes,
             'today' => $today,
         ]);
     }
@@ -33,28 +37,11 @@ class QueueController extends Controller
             'patient_id' => ['required', 'exists:patients,id'],
         ]);
 
-        $today = now()->toDateString();
-
-        $hasActiveQueue = Queue::where('patient_id', $validated['patient_id'])
-            ->where('queue_date', $today)
-            ->where('status', '!=', 'done')
-            ->exists();
-
-        if ($hasActiveQueue) {
+        if (Queue::hasActiveToday($validated['patient_id'])) {
             return back()->with('error', 'Pasien ini sudah memiliki antrean aktif hari ini.');
         }
 
-        $queue = DB::transaction(function () use ($validated, $today) {
-            $last = Queue::where('queue_date', $today)->lockForUpdate()->orderByDesc('id')->first();
-            $next = $last ? ((int) substr($last->queue_number, 2)) + 1 : 1;
-
-            return Queue::create([
-                'patient_id' => $validated['patient_id'],
-                'queue_number' => 'A-'.str_pad((string) $next, 3, '0', STR_PAD_LEFT),
-                'queue_date' => $today,
-                'status' => 'waiting',
-            ]);
-        });
+        $queue = Queue::createForPatient($validated['patient_id'], 'staff');
 
         return redirect()->route('queues.print', $queue)->with('success', "Antrean {$queue->queue_number} berhasil dibuat.");
     }

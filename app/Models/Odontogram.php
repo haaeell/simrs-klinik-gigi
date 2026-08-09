@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 
 #[Fillable([
     'patient_id', 'visit_id', 'doctor_id', 'examination_date',
@@ -50,5 +51,37 @@ class Odontogram extends Model
     public function teeth(): HasMany
     {
         return $this->hasMany(OdontogramTooth::class);
+    }
+
+    /**
+     * Tooth-by-tooth diff between two odontograms — only teeth whose condition/surfaces
+     * actually changed are returned. Built once here so both the doctor-facing comparison
+     * (per visit) and the patient-facing one (latest vs. previous) can reuse it.
+     */
+    public static function diffTeeth(?self $current, ?self $previous): Collection
+    {
+        $currentTeeth = $current?->teeth->keyBy('tooth_number') ?? collect();
+        $previousTeeth = $previous?->teeth->keyBy('tooth_number') ?? collect();
+
+        $numbers = $currentTeeth->keys()->merge($previousTeeth->keys())->unique()->sort();
+
+        return $numbers->map(function ($number) use ($currentTeeth, $previousTeeth) {
+            $before = $previousTeeth->get($number);
+            $after = $currentTeeth->get($number);
+
+            $describe = fn ($tooth) => $tooth
+                ? $tooth->condition.($tooth->surfaces ? " ({$tooth->surfaces})" : '')
+                : 'Normal';
+
+            $beforeText = $describe($before);
+            $afterText = $describe($after);
+
+            return [
+                'tooth_number' => $number,
+                'before' => $beforeText,
+                'after' => $afterText,
+                'changed' => $beforeText !== $afterText,
+            ];
+        })->filter(fn ($row) => $row['changed'])->values();
     }
 }

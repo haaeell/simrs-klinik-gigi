@@ -52,6 +52,11 @@ class Visit extends Model
         return $this->hasMany(Attachment::class);
     }
 
+    public function controlSchedule(): HasOne
+    {
+        return $this->hasOne(ControlSchedule::class);
+    }
+
     protected function statusLabel(): Attribute
     {
         return Attribute::get(fn () => match ($this->status) {

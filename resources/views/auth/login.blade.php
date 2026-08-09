@@ -63,6 +63,10 @@
                     Masuk
                 </button>
             </form>
+
+            <p class="mt-5 text-center text-sm text-slate-500">
+                Pasien belum punya akun? <a href="{{ route('register-patient.choose') }}" class="font-medium text-blue-600 hover:text-blue-700">Daftar di sini</a>
+            </p>
         </div>
 
         <p class="mt-6 text-center text-xs text-slate-400">&copy; {{ date('Y') }} Klinik Gigi. Seluruh hak cipta dilindungi.</p>

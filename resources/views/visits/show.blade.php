@@ -130,6 +130,31 @@
                                 placeholder="Catatan tambahan pemeriksaan">{{ old('notes', $visit->notes) }}</textarea>
                         </div>
                     </div>
+
+                    <div class="mt-5 rounded-xl border border-slate-200 bg-slate-50/60 p-4" data-control-toggle>
+                        <label class="flex items-center gap-2 text-sm font-medium text-slate-700">
+                            <input type="checkbox" name="needs_control" value="1" data-control-checkbox
+                                {{ old('needs_control', $visit->controlSchedule?->status === 'scheduled') ? 'checked' : '' }}
+                                class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-200">
+                            Perlu Kontrol?
+                        </label>
+                        <div data-control-fields class="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 {{ old('needs_control', $visit->controlSchedule?->status === 'scheduled') ? '' : 'hidden' }}">
+                            <div>
+                                <label for="control_date" class="mb-1.5 block text-sm font-medium text-slate-700">Tanggal Kontrol</label>
+                                <input type="date" id="control_date" name="control_date"
+                                    value="{{ old('control_date', $visit->controlSchedule?->control_date?->toDateString()) }}"
+                                    min="{{ now()->toDateString() }}"
+                                    class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                            </div>
+                            <div>
+                                <label for="control_notes" class="mb-1.5 block text-sm font-medium text-slate-700">Catatan Kontrol</label>
+                                <input type="text" id="control_notes" name="control_notes"
+                                    value="{{ old('control_notes', $visit->controlSchedule?->notes) }}"
+                                    class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="mt-6 flex justify-end border-t border-slate-100 pt-5">
                         <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
                             <i class="fa-solid fa-floppy-disk"></i> Simpan
@@ -153,6 +178,17 @@
                     <div class="sm:col-span-2">
                         <dt class="text-xs text-slate-400">Catatan</dt>
                         <dd class="mt-1 text-sm font-medium text-slate-800">{{ $visit->notes ?: '-' }}</dd>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <dt class="text-xs text-slate-400">Jadwal Kontrol</dt>
+                        <dd class="mt-1 text-sm font-medium text-slate-800">
+                            @if ($visit->controlSchedule)
+                                {{ $visit->controlSchedule->control_date->translatedFormat('d F Y') }}
+                                <span class="ml-1 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium {{ $visit->controlSchedule->status_badge_class }}">{{ $visit->controlSchedule->status_label }}</span>
+                            @else
+                                Tidak ada jadwal kontrol.
+                            @endif
+                        </dd>
                     </div>
                 </dl>
             @endif
@@ -183,7 +219,15 @@
         <div data-tab-panel="odontogram" class="hidden overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
             <div id="odontogram-section" class="grid items-start gap-4 p-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
                 <div class="rounded-lg border border-slate-200 bg-white p-4">
-                    <h3 class="mb-4 text-base font-semibold text-slate-900">Odontogram Gigi Permanen</h3>
+                    <div class="mb-4 flex items-center justify-between gap-3">
+                        <h3 class="text-base font-semibold text-slate-900">Odontogram Gigi Permanen</h3>
+                        @if ($odontogram)
+                            <a href="{{ route('visits.odontogram.compare', $visit) }}"
+                                class="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50">
+                                <i class="fa-solid fa-code-compare"></i> Bandingkan Odontogram
+                            </a>
+                        @endif
+                    </div>
                     @include('partials.odontogram-grid', [
                         'teethByNumber' => $teethByNumber,
                         'interactive' => $canEdit,

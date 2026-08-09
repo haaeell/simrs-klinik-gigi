@@ -22,10 +22,43 @@
       "Bash(awk 'NR==19{print length\\($0\\); print}' resources/views/layouts/app.blade.php)",
       "Bash(node verify-fix.mjs)",
       "Bash(mysql -u root -D klinik_gigi -e \"SELECT id FROM visits WHERE status='examining' LIMIT 1;\")",
-      "Bash(node verify-fix2.mjs)"
+      "Bash(node verify-fix2.mjs)",
+      "Bash(mysql -u root -D klinik_gigi -e \"SELECT id, medical_record_number, name, nik, phone FROM patients WHERE nik IS NOT NULL AND phone IS NOT NULL LIMIT 1;\")",
+      "Bash(node driver-patient1.mjs)",
+      "Bash(curl -sS -o /dev/null -w \"test -> %{http_code}\\\\n\" http://127.0.0.1:8000/login)",
+      "Bash(curl -sS -b /tmp/pasien-cookies.txt -o /dev/null -w \"/dashboard -> %{http_code}\\\\n\" http://127.0.0.1:8000/dashboard)",
+      "Bash(curl -sS -b /tmp/pasien-cookies.txt -o /dev/null -w \"/patients -> %{http_code}\\\\n\" http://127.0.0.1:8000/patients)",
+      "Bash(curl -sS -b /tmp/pasien-cookies.txt -o /dev/null -w \"/queues -> %{http_code}\\\\n\" http://127.0.0.1:8000/queues)",
+      "Bash(curl -sS -b /tmp/pasien-cookies.txt -o /dev/null -w \"/visits -> %{http_code}\\\\n\" http://127.0.0.1:8000/visits)",
+      "Bash(curl -sS -b /tmp/pasien-cookies.txt -o /dev/null -w \"/users -> %{http_code}\\\\n\" http://127.0.0.1:8000/users)",
+      "Bash(curl -sS -b /tmp/pasien-cookies.txt -o /dev/null -w \"/patient/dashboard -> %{http_code}\\\\n\" http://127.0.0.1:8000/patient/dashboard)",
+      "Bash(curl -sS -b /tmp/pasien-cookies.txt -o /dev/null -w \"/patient/profile -> %{http_code}\\\\n\" http://127.0.0.1:8000/patient/profile)",
+      "Bash(curl -sS -b /tmp/admin-cookies.txt -o /dev/null -w \"admin -> /patient/dashboard -> %{http_code}\\\\n\" http://127.0.0.1:8000/patient/dashboard)",
+      "Bash(mysql -u root -D klinik_gigi -e \"SELECT id,name,email,role,patient_id FROM users WHERE role='pasien';\")",
+      "Bash(cd \"/Users/user/JOKI/SKRIPSI/SIROJUDDIN TI/klinik-gigi\" && php artisan migrate:fresh --seed 2>&1 | tail -15 && php artisan view:cache 2>&1 && rm -f public/build/assets/app-*.css && npm run build 2>&1 | tail -6)",
+      "Bash(node driver-tahap3.mjs)",
+      "Bash(php artisan *)",
+      "Bash(disown)",
+      "Bash(curl -s -b /tmp/claude-cookie.jar http://127.0.0.1:8123/patient/odontogram/compare)",
+      "Bash(curl -s -b /tmp/claude-cookie.jar -o /dev/null -w 'history: %{http_code}\\\\n' http://127.0.0.1:8123/patient/history)",
+      "Bash(curl -s -b /tmp/claude-cookie.jar -o /dev/null -w 'odontogram: %{http_code}\\\\n' http://127.0.0.1:8123/patient/odontogram)",
+      "Bash(curl -s -b /tmp/claude-cookie.jar -o /dev/null -w 'odontogram-compare: %{http_code}\\\\n' http://127.0.0.1:8123/patient/odontogram/compare)",
+      "Bash(grep -n \"data-tabs\\\\|data-confirm\\\\|\\\\$\\(document\\).ready\\\\|data-queue-action\" resources/js/app.js)",
+      "Bash(curl -s -b /tmp/claude-cookie.jar -o /dev/null -w 'control-schedules: %{http_code}\\\\n' http://127.0.0.1:8123/patient/control-schedules)",
+      "Bash(curl -s -b /tmp/claude-cookie.jar -o /dev/null -w 'notifications: %{http_code}\\\\n' http://127.0.0.1:8123/patient/notifications)",
+      "Bash(curl -s -b /tmp/claude-cookie.jar -o /dev/null -w 'dashboard: %{http_code}\\\\n' http://127.0.0.1:8123/patient/dashboard)",
+      "Bash(curl -s -b /tmp/claude-cookie.jar http://127.0.0.1:8123/patient/notifications)",
+      "Bash(curl -s -b /tmp/claude-cookie.jar http://127.0.0.1:8123/patient/dashboard)",
+      "Bash(grep -i \"chrome-linux\\\\|chromium/.*chrome$\\\\|mac-.*Chromium\")",
+      "Read(//Users/user/Library/Caches/**)",
+      "Bash(curl -s -b /tmp/claude-admin.jar -o /dev/null -w 'visits.index: %{http_code}\\\\n' http://127.0.0.1:8123/visits)",
+      "Bash(curl -s -b /tmp/claude-admin.jar http://127.0.0.1:8123/visits)",
+      "Bash(curl -s -b /tmp/claude-doc.jar http://127.0.0.1:8123/visits/16)",
+      "Bash(pkill -f \"artisan serve --port=8123\")"
     ],
     "additionalDirectories": [
-      "/Users/user/JOKI/SKRIPSI/SIROJUDDIN TI/klinik-gigi/storage/app/public/attachments"
+      "/Users/user/JOKI/SKRIPSI/SIROJUDDIN TI/klinik-gigi/storage/app/public/attachments",
+      "/Users/user/JOKI/SKRIPSI/SIROJUDDIN TI/klinik-gigi/public/build/assets"
     ]
   }
 }

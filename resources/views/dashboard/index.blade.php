@@ -55,6 +55,40 @@
             </div>
         </div>
 
+        <div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <p class="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    <i class="fa-solid fa-hourglass-half"></i> Rata-rata Waktu Tunggu
+                </p>
+                <p class="text-2xl font-semibold text-slate-900">{{ $counts['avg_wait_minutes'] }} <span class="text-sm font-normal text-slate-400">menit</span></p>
+            </div>
+            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <p class="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    <i class="fa-solid fa-stethoscope"></i> Rata-rata Durasi Pemeriksaan
+                </p>
+                <p class="text-2xl font-semibold text-slate-900">{{ $counts['avg_examination_minutes'] }} <span class="text-sm font-normal text-slate-400">menit</span></p>
+            </div>
+            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <p class="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    <i class="fa-solid fa-user-check"></i> Total Pasien Hari Ini
+                </p>
+                <p class="text-2xl font-semibold text-slate-900">{{ $counts['patients_today'] }}</p>
+            </div>
+            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <p class="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    <i class="fa-solid fa-chart-pie"></i> Sumber Pendaftaran
+                </p>
+                <div class="space-y-1 text-sm">
+                    @foreach (\App\Models\Queue::SOURCES as $key => $label)
+                        <div class="flex items-center justify-between">
+                            <span class="text-slate-500">{{ $label }}</span>
+                            <span class="font-semibold text-slate-900">{{ $sourceCounts[$key] }}</span>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
         <div class="mt-8">
             <div class="mb-4 flex items-center justify-between">
                 <h3 class="text-sm font-semibold text-slate-900">Antrean Hari Ini</h3>

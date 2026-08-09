@@ -111,6 +111,41 @@ class ReportController extends Controller
         return view('reports.treatments', compact('treatments', 'doctors', 'start', 'end', 'doctorId', 'keyword'));
     }
 
+    public function serviceTime(Request $request)
+    {
+        [$start, $end] = $this->dateRange($request);
+        $doctorId = $request->input('doctor_id');
+        $source = $request->input('source');
+
+        $queues = Queue::with(['patient', 'visit.doctor'])
+            ->whereBetween('queue_date', [$start, $end])
+            ->when($source, fn ($q) => $q->where('registration_source', $source))
+            ->when($doctorId, fn ($q) => $q->whereHas('visit', fn ($v) => $v->where('doctor_id', $doctorId)))
+            ->orderBy('queue_date')
+            ->orderBy('queue_number')
+            ->get();
+
+        $waitMinutes = $queues->filter(fn ($q) => $q->called_at)
+            ->map(fn ($q) => $q->created_at->diffInMinutes($q->called_at));
+
+        $examinationMinutes = $queues->filter(fn ($q) => $q->started_at && $q->finished_at)
+            ->map(fn ($q) => $q->started_at->diffInMinutes($q->finished_at));
+
+        $sourceCounts = collect(Queue::SOURCES)->keys()
+            ->mapWithKeys(fn ($key) => [$key => $queues->where('registration_source', $key)->count()]);
+
+        $summary = [
+            'total' => $queues->count(),
+            'avg_wait_minutes' => $waitMinutes->isEmpty() ? 0 : (int) round($waitMinutes->avg()),
+            'avg_examination_minutes' => $examinationMinutes->isEmpty() ? 0 : (int) round($examinationMinutes->avg()),
+            'source_counts' => $sourceCounts,
+        ];
+
+        $doctors = User::where('role', 'dokter')->orderBy('name')->get();
+
+        return view('reports.service-time', compact('queues', 'summary', 'doctors', 'start', 'end', 'doctorId', 'source'));
+    }
+
     private function dateRange(Request $request): array
     {
         $start = $request->input('start_date') ?: now()->startOfMonth()->toDateString();

@@ -34,8 +34,17 @@ class DashboardController extends Controller
                 ->limit(5)
                 ->get();
 
+            $sourceCounts = collect(Queue::SOURCES)->keys()
+                ->mapWithKeys(fn ($source) => [$source => $todayQueues->where('registration_source', $source)->count()]);
+
             return view('dashboard.index', [
-                'counts' => $counts + ['total_patients' => Patient::count()],
+                'counts' => $counts + [
+                    'total_patients' => Patient::count(),
+                    'patients_today' => $todayQueues->pluck('patient_id')->unique()->count(),
+                    'avg_wait_minutes' => Queue::averageWaitMinutesToday(),
+                    'avg_examination_minutes' => Queue::averageExaminationMinutes(),
+                ],
+                'sourceCounts' => $sourceCounts,
                 'queueRows' => $queueRows,
                 'recentVisits' => $recentVisits,
             ]);

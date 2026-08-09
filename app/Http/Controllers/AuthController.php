@@ -28,7 +28,9 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard'));
+        $fallback = Auth::user()->isPasien() ? route('patient.dashboard') : route('dashboard');
+
+        return redirect()->intended($fallback);
     }
 
     public function logout(Request $request)

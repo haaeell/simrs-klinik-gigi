@@ -51,6 +51,27 @@ class Patient extends Model
         return $this->hasMany(Attachment::class);
     }
 
+    public function user(): HasOne
+    {
+        return $this->hasOne(User::class);
+    }
+
+    public function controlSchedules(): HasMany
+    {
+        return $this->hasMany(ControlSchedule::class);
+    }
+
+    /**
+     * Next upcoming (not-yet-passed) scheduled control, if any — used by the patient
+     * dashboard and reminder surfaces.
+     */
+    public function nextControlSchedule(): HasOne
+    {
+        return $this->hasOne(ControlSchedule::class)
+            ->where('status', 'scheduled')
+            ->oldestOfMany('control_date');
+    }
+
     protected function genderLabel(): Attribute
     {
         return Attribute::get(fn () => match ($this->gender) {
@@ -58,5 +79,17 @@ class Patient extends Model
             'P' => 'Perempuan',
             default => '-',
         });
+    }
+
+    /**
+     * Next sequential RM-000001 style number. Must be called inside a DB transaction
+     * (uses lockForUpdate) to stay safe under concurrent patient registration.
+     */
+    public static function generateNextMedicalRecordNumber(): string
+    {
+        $last = self::lockForUpdate()->orderByDesc('id')->first();
+        $next = $last ? ((int) substr($last->medical_record_number, 3)) + 1 : 1;
+
+        return 'RM-'.str_pad((string) $next, 6, '0', STR_PAD_LEFT);
     }
 }
