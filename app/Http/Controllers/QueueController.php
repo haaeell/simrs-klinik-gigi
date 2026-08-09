@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DisplaySetting;
 use App\Models\Queue;
 use App\Models\Visit;
 use Illuminate\Http\Request;
@@ -135,12 +136,23 @@ class QueueController extends Controller
             ->limit(3)
             ->pluck('queue_number');
 
+        $setting = DisplaySetting::current();
+
         return [
             'current' => $current ? [
                 'queue_number' => $current->queue_number,
                 'patient_name' => $current->patient->name,
+                'called_at' => $current->called_at?->toIso8601String(),
+                'announcement' => $setting->renderAnnouncement($current->queue_number, $current->patient->name),
             ] : null,
             'next' => $next,
+            'settings' => [
+                'chime_style' => $setting->chime_style,
+                'voice_name' => $setting->voice_name,
+                'voice_lang' => $setting->voice_lang,
+                'voice_rate' => $setting->voice_rate,
+                'voice_pitch' => $setting->voice_pitch,
+            ],
         ];
     }
 

@@ -54,7 +54,14 @@
       "Bash(curl -s -b /tmp/claude-admin.jar -o /dev/null -w 'visits.index: %{http_code}\\\\n' http://127.0.0.1:8123/visits)",
       "Bash(curl -s -b /tmp/claude-admin.jar http://127.0.0.1:8123/visits)",
       "Bash(curl -s -b /tmp/claude-doc.jar http://127.0.0.1:8123/visits/16)",
-      "Bash(pkill -f \"artisan serve --port=8123\")"
+      "Bash(pkill -f \"artisan serve --port=8123\")",
+      "Bash(curl -s http://127.0.0.1:8123/queues/display-data)",
+      "Bash(curl -s http://127.0.0.1:8123/queues/display)",
+      "Bash(curl -s -o /dev/null -w \"login page: %{http_code}\\\\n\" http://127.0.0.1:8123/login)",
+      "Bash(curl -s http://127.0.0.1:8123/login)",
+      "Bash(grep -rln '@php\\($clinic' resources/views/)",
+      "Bash(curl -s -b /tmp/claude-admin.jar http://127.0.0.1:8123/settings)",
+      "Bash(curl -s -o /dev/null -w \"logo file: %{http_code}\\\\n\" \"http://127.0.0.1:8123/storage/branding/ShseLd1De56bUQd8j37JlSctafYqOmctYKtoqYXV.png\")"
     ],
     "additionalDirectories": [
       "/Users/user/JOKI/SKRIPSI/SIROJUDDIN TI/klinik-gigi/storage/app/public/attachments",

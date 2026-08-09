@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Dashboard') - Klinik Gigi</title>
+    @php
+        $clinic = \App\Models\SystemSetting::current();
+    @endphp
+    <title>@yield('title', 'Dashboard') - {{ $clinic->clinic_name }}</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -18,11 +21,15 @@
 
     <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 flex w-64 -translate-x-full flex-col border-r border-slate-200 bg-white transition-transform duration-200 ease-in-out lg:translate-x-0 print:hidden">
         <div class="flex h-16 shrink-0 items-center gap-2 border-b border-slate-200 px-5">
-            <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white">
-                <i class="fa-solid fa-tooth"></i>
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl text-white" style="background-color: {{ $clinic->primary_color }}">
+                @if ($clinic->logo_url)
+                    <img src="{{ $clinic->logo_url }}" alt="{{ $clinic->clinic_name }}" class="h-full w-full object-cover">
+                @else
+                    <i class="fa-solid fa-tooth"></i>
+                @endif
             </span>
-            <div class="leading-tight">
-                <p class="text-sm font-semibold text-slate-900">Klinik Gigi</p>
+            <div class="min-w-0 leading-tight">
+                <p class="truncate text-sm font-semibold text-slate-900">{{ $clinic->clinic_name }}</p>
                 <p class="text-xs text-slate-400">Sistem Antrean &amp; RM</p>
             </div>
             <button id="sidebar-close" type="button" class="ml-auto text-slate-400 hover:text-slate-600 lg:hidden">
@@ -52,6 +59,7 @@
                         ['label' => 'Rekam Medis', 'icon' => 'fa-notes-medical', 'route' => 'visits.index'],
                         ['label' => 'Laporan', 'icon' => 'fa-chart-line', 'route' => 'reports.visits'],
                         ['label' => 'Pengguna', 'icon' => 'fa-user-doctor', 'route' => 'users.index', 'adminOnly' => true],
+                        ['label' => 'Pengaturan Sistem', 'icon' => 'fa-gear', 'route' => 'settings.edit', 'adminOnly' => true],
                     ];
                 }
             @endphp

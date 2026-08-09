@@ -3,12 +3,14 @@
 use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DisplaySettingController;
 use App\Http\Controllers\OdontogramController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PatientPortalController;
 use App\Http\Controllers\PatientRegistrationController;
 use App\Http\Controllers\QueueController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SystemSettingController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VisitController;
 use Illuminate\Support\Facades\Route;
@@ -74,6 +76,12 @@ Route::middleware('auth')->group(function () {
 
         Route::middleware('role:admin')->group(function () {
             Route::resource('users', UserController::class)->except(['show']);
+
+            Route::get('/queues/display-settings', [DisplaySettingController::class, 'edit'])->name('queues.display-settings.edit');
+            Route::put('/queues/display-settings', [DisplaySettingController::class, 'update'])->name('queues.display-settings.update');
+
+            Route::get('/settings', [SystemSettingController::class, 'edit'])->name('settings.edit');
+            Route::put('/settings', [SystemSettingController::class, 'update'])->name('settings.update');
         });
     });
 

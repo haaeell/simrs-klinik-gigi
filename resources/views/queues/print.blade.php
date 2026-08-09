@@ -24,9 +24,15 @@
         </button>
     </div>
 
+    @php
+        $clinic = \App\Models\SystemSetting::current();
+    @endphp
     <div class="mx-auto w-full max-w-xs rounded-2xl border border-slate-200 bg-white p-6 font-mono text-sm text-slate-800 shadow-sm print:max-w-none print:rounded-none print:border-0 print:shadow-none">
         <p class="text-center">================================</p>
-        <p class="py-1 text-center text-base font-bold tracking-wide">KLINIK GIGI</p>
+        <p class="py-1 text-center text-base font-bold uppercase tracking-wide">{{ $clinic->clinic_name }}</p>
+        @if ($clinic->address)
+            <p class="text-center text-xs leading-relaxed text-slate-500">{{ $clinic->address }}</p>
+        @endif
         <p class="text-center">================================</p>
 
         <p class="mt-4 text-center text-xs tracking-widest">NOMOR ANTREAN</p>

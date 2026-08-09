@@ -33,6 +33,12 @@
                 class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50">
                 <i class="fa-solid fa-tv"></i> Layar Antrean
             </a>
+            @if (auth()->user()->isAdmin() && \Illuminate\Support\Facades\Route::has('queues.display-settings.edit'))
+                <a href="{{ route('queues.display-settings.edit') }}"
+                    class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50">
+                    <i class="fa-solid fa-gear"></i> Atur Suara
+                </a>
+            @endif
             <a href="{{ route('patients.index') }}"
                 class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
                 <i class="fa-solid fa-plus"></i> Tambah Antrean
