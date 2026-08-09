@@ -86,7 +86,7 @@
         </div>
 
         <div class="flex justify-end">
-            <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
+            <button type="submit" title="Simpan identitas klinik" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
                 <i class="fa-solid fa-floppy-disk"></i> Simpan Pengaturan
             </button>
         </div>

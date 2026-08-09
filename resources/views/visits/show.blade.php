@@ -45,7 +45,7 @@
                     data-confirm-button="Ya, Selesaikan"
                     data-confirm-icon="question">
                     @csrf
-                    <button type="submit"
+                    <button type="submit" title="Tandai pemeriksaan selesai, data tidak bisa diubah lagi"
                         class="inline-flex shrink-0 items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700">
                         <i class="fa-solid fa-circle-check"></i> Selesaikan Pemeriksaan
                     </button>
@@ -156,7 +156,8 @@
                     </div>
 
                     <div class="mt-6 flex justify-end border-t border-slate-100 pt-5">
-                        <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
+                        <button type="submit" title="Simpan keluhan, diagnosis, dan catatan pemeriksaan"
+                            class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
                             <i class="fa-solid fa-floppy-disk"></i> Simpan
                         </button>
                     </div>
@@ -222,7 +223,7 @@
                     <div class="mb-4 flex items-center justify-between gap-3">
                         <h3 class="text-base font-semibold text-slate-900">Odontogram Gigi Permanen</h3>
                         @if ($odontogram)
-                            <a href="{{ route('visits.odontogram.compare', $visit) }}"
+                            <a href="{{ route('visits.odontogram.compare', $visit) }}" title="Bandingkan kondisi gigi dengan pemeriksaan sebelumnya"
                                 class="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50">
                                 <i class="fa-solid fa-code-compare"></i> Bandingkan Odontogram
                             </a>
@@ -322,7 +323,8 @@
                             class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100">
                     </div>
                     <div class="sm:col-span-2 lg:col-span-5">
-                        <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+                        <button type="submit" title="Simpan tindakan/perawatan baru ke daftar"
+                            class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
                             <i class="fa-solid fa-plus"></i> Tambah Tindakan
                         </button>
                     </div>
@@ -394,7 +396,8 @@
                             class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100">
                     </div>
                     <div class="sm:col-span-4">
-                        <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+                        <button type="submit" title="Unggah file sebagai lampiran kunjungan ini"
+                            class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
                             <i class="fa-solid fa-upload"></i> Unggah Lampiran
                         </button>
                     </div>
@@ -422,7 +425,7 @@
                                 <p class="mt-1 text-xs text-slate-500">{{ $attachment->description }}</p>
                             @endif
                             <div class="mt-2 flex items-center justify-between">
-                                <a href="{{ $attachment->url }}" target="_blank" class="text-xs font-medium text-blue-600 hover:text-blue-700">
+                                <a href="{{ $attachment->url }}" target="_blank" title="Buka file lampiran di tab baru" class="text-xs font-medium text-blue-600 hover:text-blue-700">
                                     <i class="fa-solid fa-eye"></i> Lihat
                                 </a>
                                 @if ($canEdit)
@@ -430,7 +433,7 @@
                                         data-confirm data-confirm-text="Lampiran &quot;{{ $attachment->original_name }}&quot; akan dihapus.">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-xs font-medium text-red-500 hover:text-red-700">
+                                        <button type="submit" title="Hapus lampiran ini" class="text-xs font-medium text-red-500 hover:text-red-700">
                                             <i class="fa-solid fa-trash-can"></i>
                                         </button>
                                     </form>
@@ -467,7 +470,7 @@
                                 <p class="mt-1 text-xs text-slate-500">Diagnosis: {{ $historyVisit->diagnosis }} @if($historyVisit->icd10_code)({{ $historyVisit->icd10_code }})@endif</p>
                             @endif
                         </div>
-                        <a href="{{ route('visits.show', $historyVisit) }}" class="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700">
+                        <a href="{{ route('visits.show', $historyVisit) }}" title="Lihat detail kunjungan ini" class="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700">
                             Detail <i class="fa-solid fa-arrow-right text-xs"></i>
                         </a>
                     </div>

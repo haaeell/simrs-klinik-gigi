@@ -61,11 +61,32 @@
       "Bash(curl -s http://127.0.0.1:8123/login)",
       "Bash(grep -rln '@php\\($clinic' resources/views/)",
       "Bash(curl -s -b /tmp/claude-admin.jar http://127.0.0.1:8123/settings)",
-      "Bash(curl -s -o /dev/null -w \"logo file: %{http_code}\\\\n\" \"http://127.0.0.1:8123/storage/branding/ShseLd1De56bUQd8j37JlSctafYqOmctYKtoqYXV.png\")"
+      "Bash(curl -s -o /dev/null -w \"logo file: %{http_code}\\\\n\" \"http://127.0.0.1:8123/storage/branding/ShseLd1De56bUQd8j37JlSctafYqOmctYKtoqYXV.png\")",
+      "Bash(curl -s -o /dev/null -w \"display \\(no rooms yet\\): %{http_code}\\\\n\" http://127.0.0.1:8123/queues/display)",
+      "Bash(curl -s -b /tmp/claude-admin.jar http://127.0.0.1:8123/rooms)",
+      "Bash(node --check resources/js/app.js)",
+      "Bash(node test-call.js)",
+      "Bash(node test-call2.js)",
+      "Bash(node test-call3.js)",
+      "Bash(node test-call4.js)",
+      "Bash(node test-regress.js)",
+      "Bash(node test-flow.js)",
+      "Bash(node test-flow2.js)",
+      "Bash(cd \"/Users/user/JOKI/SKRIPSI/SIROJUDDIN TI/klinik-gigi\" && php artisan view:cache 2>&1 | tail -3 && npm run build 2>&1 | tail -6 && php artisan view:clear 2>&1 | tail -3 *)",
+      "Bash(node test-search.js)",
+      "Bash(curl -s -b /tmp/claude-admin.jar http://127.0.0.1:8123/patients)",
+      "Bash(curl -s -b /tmp/claude-admin.jar http://127.0.0.1:8123/patients?search=dirja)",
+      "Bash(node test-online.js)",
+      "Bash(node test-qr.js)",
+      "Bash(composer show *)",
+      "Bash(node test-qrdisplay.js)",
+      "Bash(grep -A3 \"checkin-qr\\\\\"\\), {\")",
+      "Bash(curl -s -b /tmp/claude-guest.jar -c /tmp/claude-guest.jar -o /dev/null -w 'guest -> /check-in: %{http_code} redirect_to=%{redirect_url}\\\\n' http://127.0.0.1:8123/check-in)"
     ],
     "additionalDirectories": [
       "/Users/user/JOKI/SKRIPSI/SIROJUDDIN TI/klinik-gigi/storage/app/public/attachments",
-      "/Users/user/JOKI/SKRIPSI/SIROJUDDIN TI/klinik-gigi/public/build/assets"
+      "/Users/user/JOKI/SKRIPSI/SIROJUDDIN TI/klinik-gigi/public/build/assets",
+      "/private/tmp/claude-502/-Users-user-JOKI-SKRIPSI-SIROJUDDIN-TI-klinik-gigi/cbef1821-b430-4850-9dc8-5ad1cf61b747/scratchpad"
     ]
   }
 }

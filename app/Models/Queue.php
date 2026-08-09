@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\DB;
 
 #[Fillable([
-    'patient_id', 'queue_number', 'queue_date', 'status', 'registration_source',
+    'patient_id', 'queue_number', 'queue_date', 'status', 'registration_source', 'room_id', 'complaint',
     'called_at', 'started_at', 'finished_at',
 ])]
 class Queue extends Model
@@ -46,6 +46,11 @@ class Queue extends Model
         return $this->hasOne(Visit::class);
     }
 
+    public function room(): BelongsTo
+    {
+        return $this->belongsTo(Room::class);
+    }
+
     public static function hasActiveToday(int $patientId): bool
     {
         return self::where('patient_id', $patientId)
@@ -66,12 +71,16 @@ class Queue extends Model
     /**
      * Create the next sequential A-001 style number for today (reused by staff, online, and QR booking).
      * Wrapped in a transaction + row lock to stay safe under concurrent requests.
+     *
+     * $roomId lets staff pick the doctor/room right at booking time (walk-in registration),
+     * so "Panggil" later doesn't need to ask again. Online/QR self-booking leaves it null —
+     * staff picks the room when they call that patient instead.
      */
-    public static function createForPatient(int $patientId, string $source = 'staff'): self
+    public static function createForPatient(int $patientId, string $source = 'staff', ?int $roomId = null, ?string $complaint = null): self
     {
         $today = now()->toDateString();
 
-        return DB::transaction(function () use ($patientId, $today, $source) {
+        return DB::transaction(function () use ($patientId, $today, $source, $roomId, $complaint) {
             $last = self::where('queue_date', $today)->lockForUpdate()->orderByDesc('id')->first();
             $next = $last ? ((int) substr($last->queue_number, 2)) + 1 : 1;
 
@@ -81,6 +90,8 @@ class Queue extends Model
                 'queue_date' => $today,
                 'status' => 'waiting',
                 'registration_source' => $source,
+                'room_id' => $roomId,
+                'complaint' => $complaint,
             ]);
         });
     }

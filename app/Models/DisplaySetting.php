@@ -36,17 +36,31 @@ class DisplaySetting extends Model
     }
 
     /**
-     * Replace {letter}/{number}/{patient_name} placeholders with real values for TTS.
+     * Replace {letter}/{number}/{patient_name}/{room} placeholders with real values for TTS.
+     *
+     * If a room is given but the admin's template doesn't reference {room} at all, the room
+     * is still announced by appending a short sentence — otherwise a clinic with rooms set up
+     * would silently never hear where to send the patient just because the template predates
+     * that feature (or was customized before rooms existed).
      */
-    public function renderAnnouncement(string $queueNumber, string $patientName): string
+    public function renderAnnouncement(string $queueNumber, string $patientName, ?string $roomName = null): string
     {
         $letter = preg_replace('/[^A-Za-z]/', '', $queueNumber);
         $number = (int) preg_replace('/\D/', '', $queueNumber);
+        $template = $this->announcement_template;
+        $mentionsRoom = str_contains($template, '{room}');
 
-        return strtr($this->announcement_template, [
+        $text = strtr($template, [
             '{letter}' => $letter,
             '{number}' => (string) $number,
             '{patient_name}' => $patientName,
+            '{room}' => $roomName ?? '',
         ]);
+
+        if ($roomName && ! $mentionsRoom) {
+            $text .= " Silakan menuju {$roomName}.";
+        }
+
+        return $text;
     }
 }

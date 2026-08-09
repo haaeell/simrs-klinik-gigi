@@ -239,13 +239,15 @@
                                         <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium {{ $queue->status_badge_class }}">{{ $queue->status_label }}</span>
                                     </td>
                                     <td class="px-5 py-3.5 text-right">
-                                        @if ($queue->status === 'called')
+                                        @if ($queue->status === 'called' && (! $queue->room_id || $queue->room->doctor_id === auth()->id()))
                                             <form action="{{ route('queues.start-examination', $queue) }}" method="POST">
                                                 @csrf
                                                 <button type="submit" class="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700">
                                                     <i class="fa-solid fa-stethoscope"></i> Mulai Pemeriksaan
                                                 </button>
                                             </form>
+                                        @elseif ($queue->status === 'called')
+                                            <span class="text-xs italic text-slate-400">Ruang dokter lain</span>
                                         @else
                                             <span class="text-xs text-slate-400">Menunggu dipanggil</span>
                                         @endif

@@ -10,6 +10,7 @@ use App\Http\Controllers\PatientPortalController;
 use App\Http\Controllers\PatientRegistrationController;
 use App\Http\Controllers\QueueController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\RoomController;
 use App\Http\Controllers\SystemSettingController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VisitController;
@@ -47,6 +48,7 @@ Route::middleware('auth')->group(function () {
             ->name('patients.medical-history.update');
 
         Route::get('/queues', [QueueController::class, 'index'])->name('queues.index');
+        Route::get('/queues/create', [QueueController::class, 'create'])->name('queues.create');
         Route::post('/queues', [QueueController::class, 'store'])->name('queues.store');
         Route::post('/queues/{queue}/call', [QueueController::class, 'call'])->name('queues.call');
         Route::post('/queues/{queue}/recall', [QueueController::class, 'recall'])->name('queues.recall');
@@ -82,6 +84,8 @@ Route::middleware('auth')->group(function () {
 
             Route::get('/settings', [SystemSettingController::class, 'edit'])->name('settings.edit');
             Route::put('/settings', [SystemSettingController::class, 'update'])->name('settings.update');
+
+            Route::resource('rooms', RoomController::class)->except(['show']);
         });
     });
 

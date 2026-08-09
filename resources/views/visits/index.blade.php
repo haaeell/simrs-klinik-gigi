@@ -6,10 +6,13 @@
 
 @section('content')
     <div class="mb-5">
-        <form method="GET" class="relative w-full sm:max-w-sm">
+        <form method="GET" data-live-search class="relative w-full sm:max-w-sm">
             <i class="fa-solid fa-magnifying-glass pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-slate-400"></i>
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari No RM atau nama pasien..."
-                class="w-full rounded-xl border border-slate-300 py-2.5 pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100">
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari No RM atau nama pasien..." title="Ketik lalu tunggu sebentar, hasil otomatis terfilter"
+                class="w-full rounded-xl border border-slate-300 py-2.5 pl-9 pr-16 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100">
+            <button type="submit" title="Cari sekarang" class="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-lg px-3 py-1.5 text-xs font-semibold text-blue-600 hover:bg-blue-50">
+                Cari
+            </button>
         </form>
     </div>
 

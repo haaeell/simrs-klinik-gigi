@@ -20,18 +20,14 @@
                 </div>
             </div>
             <div class="flex shrink-0 items-center gap-2">
-                <a href="{{ route('patients.edit', $patient) }}"
+                <a href="{{ route('patients.edit', $patient) }}" title="Ubah data identitas pasien"
                     class="inline-flex items-center gap-2 rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">
                     <i class="fa-solid fa-pen"></i> Edit Data
                 </a>
-                <form action="{{ route('queues.store') }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="patient_id" value="{{ $patient->id }}">
-                    <button type="submit"
-                        class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
-                        <i class="fa-solid fa-ticket"></i> Buat Antrean
-                    </button>
-                </form>
+                <a href="{{ route('queues.create', ['patient_id' => $patient->id]) }}" title="Pilih dokter, catat keluhan, lalu cetak nomor antrean"
+                    class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
+                    <i class="fa-solid fa-ticket"></i> Buat Antrean
+                </a>
             </div>
         </div>
 

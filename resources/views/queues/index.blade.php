@@ -29,17 +29,17 @@
     <div class="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h2 class="text-sm font-semibold text-slate-900">Daftar Antrean</h2>
         <div class="flex items-center gap-2">
-            <a href="{{ route('queues.display') }}" target="_blank"
+            <a href="{{ route('queues.display') }}" target="_blank" title="Buka layar TV untuk ruang tunggu"
                 class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50">
                 <i class="fa-solid fa-tv"></i> Layar Antrean
             </a>
             @if (auth()->user()->isAdmin() && \Illuminate\Support\Facades\Route::has('queues.display-settings.edit'))
-                <a href="{{ route('queues.display-settings.edit') }}"
+                <a href="{{ route('queues.display-settings.edit') }}" title="Atur kalimat pengumuman, nada dering, dan suara panggilan"
                     class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50">
                     <i class="fa-solid fa-gear"></i> Atur Suara
                 </a>
             @endif
-            <a href="{{ route('patients.index') }}"
+            <a href="{{ route('patients.index') }}" title="Cari/pilih pasien untuk dibuatkan antrean baru"
                 class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
                 <i class="fa-solid fa-plus"></i> Tambah Antrean
             </a>
@@ -57,6 +57,7 @@
                         <th class="px-5 py-3 font-medium">Sumber</th>
                         <th class="px-5 py-3 font-medium">Estimasi Tunggu</th>
                         <th class="px-5 py-3 font-medium">Jam Daftar</th>
+                        <th class="px-5 py-3 font-medium">Ruang</th>
                         <th class="px-5 py-3 font-medium">Status</th>
                         <th class="px-5 py-3 font-medium text-right">Aksi</th>
                     </tr>
@@ -66,7 +67,8 @@
                         <tr data-queue-row="{{ $queue->id }}" class="hover:bg-slate-50/60">
                             <td class="px-5 py-3.5 font-mono text-sm font-semibold text-slate-900">{{ $queue->queue_number }}</td>
                             <td class="px-5 py-3.5">
-                                <a href="{{ route('patients.show', $queue->patient) }}" class="font-medium text-slate-900 hover:text-blue-600">
+                                <a href="{{ route('patients.show', $queue->patient) }}" class="font-medium text-slate-900 hover:text-blue-600"
+                                    title="{{ $queue->complaint ? 'Keluhan: '.$queue->complaint : 'Keluhan belum dicatat' }}">
                                     {{ $queue->patient->name }}
                                 </a>
                             </td>
@@ -80,6 +82,9 @@
                                 {{ $queue->status === 'waiting' ? '±'.($queue->patientsAhead() * $avgExaminationMinutes).' menit' : '-' }}
                             </td>
                             <td class="px-5 py-3.5 text-slate-500">{{ $queue->created_at->format('H:i') }}</td>
+                            <td class="px-5 py-3.5 text-slate-500">
+                                <span data-room-name>{{ $queue->room->name ?? '-' }}</span>
+                            </td>
                             <td class="px-5 py-3.5">
                                 <span data-status-badge class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium {{ $queue->status_badge_class }}">
                                     {{ $queue->status_label }}
@@ -88,40 +93,49 @@
                             <td class="px-5 py-3.5">
                                 <div class="flex items-center justify-end gap-2">
                                     <div data-status-actions="waiting" class="flex items-center gap-2 {{ $queue->status !== 'waiting' ? 'hidden' : '' }}">
-                                        <button type="button" data-queue-action data-url="{{ route('queues.call', $queue) }}"
+                                        <button type="button" data-queue-action data-call-action data-url="{{ route('queues.call', $queue) }}"
+                                            data-queue-number="{{ $queue->queue_number }}" data-room-id="{{ $queue->room_id }}"
+                                            title="{{ $queue->room ? 'Panggil ke '.$queue->room->name : 'Panggil pasien (pilih ruangan)' }}"
                                             class="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700">
                                             <i class="fa-solid fa-volume-high"></i> Panggil
                                         </button>
                                         <button type="button" data-queue-action data-url="{{ route('queues.skip', $queue) }}"
                                             data-confirm-text="Antrean {{ $queue->queue_number }} akan dilewati dan dapat dipanggil kembali nanti."
+                                            title="Lewati dulu, bisa dipanggil lagi nanti"
                                             class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50">
                                             Lewati
                                         </button>
                                     </div>
                                     <div data-status-actions="called" class="flex items-center gap-2 {{ $queue->status !== 'called' ? 'hidden' : '' }}">
                                         <button type="button" data-queue-action data-url="{{ route('queues.recall', $queue) }}"
+                                            title="Panggil ulang, nama & suara diumumkan kembali"
                                             class="rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-100">
                                             <i class="fa-solid fa-rotate-right"></i> Panggil Ulang
                                         </button>
-                                        @if (auth()->user()->isDokter())
+                                        @if (auth()->user()->isDokter() && (! $queue->room_id || $queue->room->doctor_id === auth()->id()))
                                             <form action="{{ route('queues.start-examination', $queue) }}" method="POST">
                                                 @csrf
-                                                <button type="submit" class="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700">
+                                                <button type="submit" title="Mulai periksa pasien ini, buka rekam medis kunjungan"
+                                                    class="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700">
                                                     <i class="fa-solid fa-stethoscope"></i> Mulai Pemeriksaan
                                                 </button>
                                             </form>
+                                        @elseif (auth()->user()->isDokter())
+                                            <span class="text-xs italic text-slate-400" title="Antrean ini dipanggil ke ruangan dokter lain">Ruang dokter lain</span>
                                         @endif
                                     </div>
                                     <div data-status-actions="skipped" class="flex items-center gap-2 {{ $queue->status !== 'skipped' ? 'hidden' : '' }}">
-                                        <button type="button" data-queue-action data-url="{{ route('queues.call', $queue) }}"
+                                        <button type="button" data-queue-action data-call-action data-url="{{ route('queues.call', $queue) }}"
+                                            data-queue-number="{{ $queue->queue_number }}" data-room-id="{{ $queue->room_id }}"
+                                            title="{{ $queue->room ? 'Panggil ke '.$queue->room->name : 'Panggil pasien (pilih ruangan)' }}"
                                             class="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700">
                                             <i class="fa-solid fa-volume-high"></i> Panggil
                                         </button>
                                     </div>
-                                    <div data-status-actions="examining" class="{{ $queue->status !== 'examining' ? 'hidden' : '' }} text-xs italic text-slate-400">
+                                    <div data-status-actions="examining" class="{{ $queue->status !== 'examining' ? 'hidden' : '' }} text-xs italic text-slate-400" title="Pasien sedang diperiksa dokter">
                                         Sedang diperiksa
                                     </div>
-                                    <div data-status-actions="done" class="{{ $queue->status !== 'done' ? 'hidden' : '' }} text-xs text-slate-300">
+                                    <div data-status-actions="done" class="{{ $queue->status !== 'done' ? 'hidden' : '' }} text-xs text-slate-300" title="Pemeriksaan sudah selesai">
                                         &mdash;
                                     </div>
                                 </div>
@@ -129,7 +143,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="px-5 py-16 text-center">
+                            <td colspan="9" class="px-5 py-16 text-center">
                                 <i class="fa-solid fa-list-ol mb-3 block text-3xl text-slate-300"></i>
                                 <p class="text-sm font-medium text-slate-500">Belum ada antrean hari ini.</p>
                                 <a href="{{ route('patients.index') }}" class="mt-3 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
@@ -142,4 +156,8 @@
             </table>
         </div>
     </div>
+
+    <script>
+        window.activeRooms = @json($activeRooms->map(fn ($room) => ['id' => $room->id, 'name' => $room->name, 'doctor_name' => $room->doctor->name]));
+    </script>
 @endsection

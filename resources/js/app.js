@@ -58,6 +58,19 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    // Live search: <form data-live-search> auto-submits shortly after typing stops, so
+    // list pages (Pasien, Rekam Medis, Pengguna) filter without needing Enter or a button.
+    document.querySelectorAll('form[data-live-search]').forEach(function (form) {
+        const input = form.querySelector('input[name="search"]');
+        if (!input) return;
+
+        let timer;
+        input.addEventListener('input', function () {
+            clearTimeout(timer);
+            timer = setTimeout(() => form.submit(), 450);
+        });
+    });
+
     // Generic tab switcher. Usage:
     // <div data-tabs> <button data-tab-target="key"> ... <div data-tab-panel="key">
     // Deep-links via ?tab=key so redirects (e.g. after a form save) can land on the right tab.
@@ -137,10 +150,10 @@ if (window.jQuery) jQuery(function ($) {
         const url = $btn.data('url');
         const $row = $btn.closest('tr[data-queue-row]');
 
-        function run() {
+        function run(data) {
             $btn.prop('disabled', true).css('opacity', 0.6);
 
-            $.post(url)
+            $.post(url, data || {})
                 .done(function (res) {
                     const q = res.queue;
 
@@ -150,6 +163,7 @@ if (window.jQuery) jQuery(function ($) {
 
                     $row.find('[data-status-actions]').addClass('hidden');
                     $row.find('[data-status-actions="' + q.status + '"]').removeClass('hidden');
+                    $row.find('[data-room-name]').text(q.room_name || '-');
 
                     $.each(res.counts, function (key, value) {
                         $('[data-count="' + key + '"]').text(value);
@@ -161,6 +175,40 @@ if (window.jQuery) jQuery(function ($) {
                 .always(function () {
                     $btn.prop('disabled', false).css('opacity', 1);
                 });
+        }
+
+        // "Panggil" — the doctor/room is normally already chosen when the queue was booked
+        // (see queues/create.blade.php), so this just calls straight away. Only ask here for
+        // queues that never got a room (online/QR self check-in, or legacy walk-ins).
+        // (Checked via attribute presence, not .data() truthiness — the attribute has no
+        // value, i.e. data-call-action="", which jQuery reads as an empty string and thus falsy.)
+        if ($btn.is('[data-call-action]')) {
+            const rooms = window.activeRooms || [];
+            const alreadyHasRoom = !!$btn.data('roomId');
+
+            if (alreadyHasRoom || rooms.length === 0) {
+                run();
+            } else {
+                Swal.fire({
+                    title: 'Panggil ke Ruang Mana?',
+                    text: 'Antrean ' + $btn.data('queueNumber'),
+                    input: 'select',
+                    inputOptions: rooms.reduce(function (opts, room) {
+                        opts[room.id] = room.name + ' — ' + room.doctor_name;
+                        return opts;
+                    }, {}),
+                    inputPlaceholder: 'Pilih ruangan',
+                    showCancelButton: true,
+                    confirmButtonText: 'Panggil',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#2563eb',
+                    reverseButtons: true,
+                    inputValidator: (value) => !value && 'Pilih ruangan terlebih dahulu.',
+                }).then((result) => {
+                    if (result.isConfirmed) run({ room_id: result.value });
+                });
+            }
+            return;
         }
 
         if ($btn.data('confirmText')) {

@@ -59,6 +59,7 @@
                         ['label' => 'Rekam Medis', 'icon' => 'fa-notes-medical', 'route' => 'visits.index'],
                         ['label' => 'Laporan', 'icon' => 'fa-chart-line', 'route' => 'reports.visits'],
                         ['label' => 'Pengguna', 'icon' => 'fa-user-doctor', 'route' => 'users.index', 'adminOnly' => true],
+                        ['label' => 'Ruangan', 'icon' => 'fa-door-open', 'route' => 'rooms.index', 'adminOnly' => true],
                         ['label' => 'Pengaturan Sistem', 'icon' => 'fa-gear', 'route' => 'settings.edit', 'adminOnly' => true],
                     ];
                 }

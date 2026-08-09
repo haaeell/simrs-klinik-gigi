@@ -86,9 +86,11 @@ class VisitSeeder extends Seeder
         $visit = Visit::create([
             'patient_id' => $queue->patient_id,
             'queue_id' => $queue->id,
-            'doctor_id' => $doctorIds->random(),
+            // Mirrors QueueController::startExamination(): the doctor is whoever the queue's
+            // room belongs to, falling back to a random one for room-less (online/QR) queues.
+            'doctor_id' => $queue->room?->doctor_id ?? $doctorIds->random(),
             'visit_date' => now()->toDateString(),
-            'complaint' => $case['complaint'],
+            'complaint' => $queue->complaint ?? $case['complaint'],
             'diagnosis' => $visitStatus === 'completed' ? $case['diagnosis'] : null,
             'icd10_code' => $visitStatus === 'completed' ? $case['icd10'] : null,
             'status' => $visitStatus,

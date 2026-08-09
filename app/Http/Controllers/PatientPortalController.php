@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ControlSchedule;
 use App\Models\Odontogram;
 use App\Models\Queue;
+use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -54,13 +55,19 @@ class PatientPortalController extends Controller
     {
         $patient = $request->user()->patient;
         $activeQueue = Queue::activeToday($patient->id);
+        $activeRooms = Room::active();
 
-        return view('patient.queue', compact('patient', 'activeQueue'));
+        return view('patient.queue', compact('patient', 'activeQueue', 'activeRooms'));
     }
 
     public function takeQueue(Request $request)
     {
-        return $this->createQueue($request, 'online');
+        $validated = $request->validate([
+            'room_id' => ['nullable', 'exists:rooms,id'],
+            'complaint' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        return $this->createQueue($request, 'online', $validated['room_id'] ?? null, $validated['complaint'] ?? null);
     }
 
     public function queueStatus(Request $request)
@@ -87,13 +94,19 @@ class PatientPortalController extends Controller
     {
         $patient = $request->user()->patient;
         $activeQueue = Queue::activeToday($patient->id);
+        $activeRooms = Room::active();
 
-        return view('patient.check-in', compact('patient', 'activeQueue'));
+        return view('patient.check-in', compact('patient', 'activeQueue', 'activeRooms'));
     }
 
     public function checkInSubmit(Request $request)
     {
-        return $this->createQueue($request, 'qr');
+        $validated = $request->validate([
+            'room_id' => ['nullable', 'exists:rooms,id'],
+            'complaint' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        return $this->createQueue($request, 'qr', $validated['room_id'] ?? null, $validated['complaint'] ?? null);
     }
 
     public function history(Request $request)
@@ -180,7 +193,7 @@ class PatientPortalController extends Controller
         return back()->with('success', 'Profil berhasil diperbarui.');
     }
 
-    private function createQueue(Request $request, string $source)
+    private function createQueue(Request $request, string $source, ?int $roomId = null, ?string $complaint = null)
     {
         $patient = $request->user()->patient;
 
@@ -188,7 +201,7 @@ class PatientPortalController extends Controller
             return redirect()->route('patient.queue')->with('error', 'Anda sudah memiliki antrean aktif hari ini.');
         }
 
-        $queue = Queue::createForPatient($patient->id, $source);
+        $queue = Queue::createForPatient($patient->id, $source, $roomId, $complaint);
 
         return redirect()->route('patient.queue')->with('success', "Antrean {$queue->queue_number} berhasil dibuat.");
     }

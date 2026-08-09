@@ -17,12 +17,10 @@
                         <i class="fa-solid fa-list-ol"></i> Lihat Antrean Saya
                     </a>
                 @else
-                    <form method="POST" action="{{ route('patient.queue.take') }}">
-                        @csrf
-                        <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
-                            <i class="fa-solid fa-ticket"></i> Ambil Antrean
-                        </button>
-                    </form>
+                    <a href="{{ route('patient.queue') }}" title="Pilih dokter dan isi keluhan untuk ambil nomor antrean"
+                        class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
+                        <i class="fa-solid fa-ticket"></i> Ambil Antrean
+                    </a>
                 @endif
             </div>
         </div>

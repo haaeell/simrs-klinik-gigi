@@ -19,8 +19,10 @@
             <h3 class="mb-1 text-sm font-semibold text-slate-900">Kalimat Pengumuman</h3>
             <p class="mb-4 text-xs text-slate-400">
                 Gunakan placeholder <code class="rounded bg-slate-100 px-1 py-0.5">{letter}</code>,
-                <code class="rounded bg-slate-100 px-1 py-0.5">{number}</code>, dan
-                <code class="rounded bg-slate-100 px-1 py-0.5">{patient_name}</code>.
+                <code class="rounded bg-slate-100 px-1 py-0.5">{number}</code>,
+                <code class="rounded bg-slate-100 px-1 py-0.5">{patient_name}</code>, dan
+                <code class="rounded bg-slate-100 px-1 py-0.5">{room}</code>.
+                Jika ruangan sudah diatur di antrean tapi <code class="rounded bg-slate-100 px-1 py-0.5">{room}</code> tidak dipakai di kalimat, nama ruangan tetap otomatis diucapkan di akhir.
             </p>
             <textarea name="announcement_template" id="announcement_template" rows="3"
                 class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100">{{ old('announcement_template', $setting->announcement_template) }}</textarea>
@@ -37,7 +39,7 @@
                     <option value="{{ $key }}" {{ old('chime_style', $setting->chime_style) === $key ? 'selected' : '' }}>{{ $label }}</option>
                 @endforeach
             </select>
-            <button type="button" id="test-chime" class="mt-3 inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50">
+            <button type="button" id="test-chime" title="Putar contoh nada dering ini" class="mt-3 inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50">
                 <i class="fa-solid fa-play"></i> Uji Coba Nada
             </button>
         </div>
@@ -71,13 +73,13 @@
                 </div>
             </div>
 
-            <button type="button" id="test-voice" class="mt-4 inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50">
+            <button type="button" id="test-voice" title="Putar contoh suara panggilan dengan pengaturan ini" class="mt-4 inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50">
                 <i class="fa-solid fa-play"></i> Uji Coba Suara
             </button>
         </div>
 
         <div class="flex justify-end">
-            <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
+            <button type="submit" title="Simpan pengaturan layar antrean" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
                 <i class="fa-solid fa-floppy-disk"></i> Simpan Pengaturan
             </button>
         </div>

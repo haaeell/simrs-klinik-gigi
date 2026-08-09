@@ -50,7 +50,7 @@ class DashboardController extends Controller
             ]);
         }
 
-        $nextQueues = Queue::with('patient')
+        $nextQueues = Queue::with(['patient', 'room'])
             ->where('queue_date', $today)
             ->whereIn('status', ['waiting', 'called'])
             ->orderBy('queue_number')

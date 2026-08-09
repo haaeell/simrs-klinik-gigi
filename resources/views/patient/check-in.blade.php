@@ -24,9 +24,37 @@
                     Lihat Antrean Saya <i class="fa-solid fa-arrow-right text-xs"></i>
                 </a>
             @else
-                <form method="POST" action="{{ route('check-in.submit') }}" class="mt-6">
+                <form method="POST" action="{{ route('check-in.submit') }}" class="mt-6 text-left">
                     @csrf
-                    <button type="submit" class="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
+                    @if ($activeRooms->isNotEmpty())
+                        <div class="mb-4">
+                            <label for="room_id" class="mb-1.5 block text-sm font-medium text-slate-700">Pilih Dokter</label>
+                            <select id="room_id" name="room_id"
+                                class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                                <option value="">(Belum tahu / bebas)</option>
+                                @foreach ($activeRooms as $room)
+                                    <option value="{{ $room->id }}" {{ old('room_id') == $room->id ? 'selected' : '' }}>
+                                        {{ $room->doctor->name }} &mdash; {{ $room->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('room_id')
+                                <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    @endif
+
+                    <div class="mb-5">
+                        <label for="complaint" class="mb-1.5 block text-sm font-medium text-slate-700">Keluhan</label>
+                        <textarea id="complaint" name="complaint" rows="3" placeholder="cth. Gigi sakit ketika mengunyah"
+                            class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100">{{ old('complaint') }}</textarea>
+                        @error('complaint')
+                            <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <button type="submit" title="Ambil nomor antrean dengan dokter dan keluhan di atas"
+                        class="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
                         <i class="fa-solid fa-ticket"></i> Ambil Antrean
                     </button>
                 </form>

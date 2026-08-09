@@ -6,10 +6,13 @@
 
 @section('content')
     <div class="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <form method="GET" class="relative w-full sm:max-w-sm">
+        <form method="GET" data-live-search class="relative w-full sm:max-w-sm">
             <i class="fa-solid fa-magnifying-glass pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-slate-400"></i>
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari No RM, NIK, nama, atau No HP..."
-                class="w-full rounded-xl border border-slate-300 py-2.5 pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100">
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari No RM, NIK, nama, atau No HP..." title="Ketik lalu tunggu sebentar, hasil otomatis terfilter"
+                class="w-full rounded-xl border border-slate-300 py-2.5 pl-9 pr-16 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100">
+            <button type="submit" title="Cari sekarang" class="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-lg px-3 py-1.5 text-xs font-semibold text-blue-600 hover:bg-blue-50">
+                Cari
+            </button>
         </form>
 
         <a href="{{ route('patients.create') }}"
@@ -56,14 +59,10 @@
                                         class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-blue-600" title="Edit">
                                         <i class="fa-solid fa-pen"></i>
                                     </a>
-                                    <form action="{{ route('queues.store') }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="patient_id" value="{{ $patient->id }}">
-                                        <button type="submit"
-                                            class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-blue-50 hover:text-blue-600" title="Buat Antrean">
-                                            <i class="fa-solid fa-ticket"></i>
-                                        </button>
-                                    </form>
+                                    <a href="{{ route('queues.create', ['patient_id' => $patient->id]) }}"
+                                        class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-blue-50 hover:text-blue-600" title="Buat Antrean & Pilih Dokter">
+                                        <i class="fa-solid fa-ticket"></i>
+                                    </a>
                                 </div>
                             </td>
                         </tr>
