@@ -93,6 +93,7 @@
             <table class="w-full text-left text-sm">
                 <thead class="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500 print:bg-transparent">
                     <tr>
+                        <th class="px-5 py-3 font-medium">No</th>
                         <th class="px-5 py-3 font-medium">Tanggal</th>
                         <th class="px-5 py-3 font-medium">No RM</th>
                         <th class="px-5 py-3 font-medium">Pasien</th>
@@ -106,6 +107,7 @@
                 <tbody class="divide-y divide-slate-100">
                     @forelse ($visits as $visit)
                         <tr>
+                            <td class="px-5 py-3 text-slate-500">{{ $loop->iteration }}</td>
                             <td class="px-5 py-3 text-slate-500">{{ $visit->visit_date->translatedFormat('d M Y') }}</td>
                             <td class="px-5 py-3 font-mono text-xs text-blue-700">{{ $visit->patient->medical_record_number }}</td>
                             <td class="px-5 py-3 font-medium text-slate-900">{{ $visit->patient->name }}</td>
@@ -121,7 +123,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="px-5 py-16 text-center">
+                            <td colspan="9" class="px-5 py-16 text-center">
                                 <i class="fa-solid fa-calendar-xmark mb-3 block text-3xl text-slate-300"></i>
                                 <p class="text-sm font-medium text-slate-500">Tidak ada kunjungan pada periode ini.</p>
                             </td>

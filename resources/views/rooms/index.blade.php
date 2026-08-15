@@ -18,6 +18,7 @@
             <table class="w-full text-left text-sm">
                 <thead class="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                     <tr>
+                        <th class="px-5 py-3 font-medium">No</th>
                         <th class="px-5 py-3 font-medium">Ruangan</th>
                         <th class="px-5 py-3 font-medium">Dokter</th>
                         <th class="px-5 py-3 font-medium">Jadwal Praktik</th>
@@ -28,6 +29,7 @@
                 <tbody class="divide-y divide-slate-100">
                     @forelse ($rooms as $room)
                         <tr class="hover:bg-slate-50/60">
+                            <td class="px-5 py-3.5 text-slate-500">{{ $loop->iteration }}</td>
                             <td class="px-5 py-3.5 font-medium text-slate-900">{{ $room->name }}</td>
                             <td class="px-5 py-3.5 text-slate-500">
                                 @if ($room->doctor)
@@ -77,7 +79,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-5 py-16 text-center">
+                            <td colspan="6" class="px-5 py-16 text-center">
                                 <i class="fa-solid fa-door-open mb-3 block text-3xl text-slate-300"></i>
                                 <p class="text-sm font-medium text-slate-500">Belum ada ruangan.</p>
                                 <p class="mt-1 text-xs text-slate-400">Tanpa ruangan, pemanggilan antrean tetap berjalan seperti biasa (satu nomor panggilan umum).</p>

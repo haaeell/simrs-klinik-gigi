@@ -24,6 +24,7 @@
             <table class="w-full text-left text-sm">
                 <thead class="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                     <tr>
+                        <th class="px-5 py-3 font-medium">No</th>
                         <th class="px-5 py-3 font-medium">Tanggal Kontrol</th>
                         <th class="px-5 py-3 font-medium">Pasien</th>
                         <th class="px-5 py-3 font-medium">Dokter</th>
@@ -35,6 +36,7 @@
                 <tbody class="divide-y divide-slate-100">
                     @forelse ($schedules as $schedule)
                         <tr class="hover:bg-slate-50/60">
+                            <td class="px-5 py-3.5 text-slate-500">{{ $loop->iteration }}</td>
                             <td class="px-5 py-3.5">
                                 <p class="font-medium text-slate-900">{{ $schedule->control_date->translatedFormat('d F Y') }}</p>
                                 @if ($schedule->reminder_text)
@@ -85,7 +87,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-5 py-16 text-center">
+                            <td colspan="7" class="px-5 py-16 text-center">
                                 <i class="fa-solid fa-calendar-check mb-3 block text-3xl text-slate-300"></i>
                                 <p class="text-sm font-medium text-slate-500">Tidak ada jadwal kontrol.</p>
                             </td>

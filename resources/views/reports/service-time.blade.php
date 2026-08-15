@@ -119,6 +119,7 @@
             <table class="w-full text-left text-sm">
                 <thead class="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500 print:bg-transparent">
                     <tr>
+                        <th class="px-5 py-3 font-medium">No</th>
                         <th class="px-5 py-3 font-medium">Tanggal</th>
                         <th class="px-5 py-3 font-medium">No Antrean</th>
                         <th class="px-5 py-3 font-medium">Pasien</th>
@@ -133,6 +134,7 @@
                 <tbody class="divide-y divide-slate-100">
                     @forelse ($queues as $queue)
                         <tr>
+                            <td class="px-5 py-3 text-slate-500">{{ $loop->iteration }}</td>
                             <td class="px-5 py-3 text-slate-500">{{ $queue->queue_date->translatedFormat('d M Y') }}</td>
                             <td class="px-5 py-3 font-mono text-sm font-semibold text-slate-900">{{ $queue->queue_number }}</td>
                             <td class="px-5 py-3 font-medium text-slate-900">{{ $queue->patient->name }}</td>
@@ -149,7 +151,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="px-5 py-16 text-center">
+                            <td colspan="10" class="px-5 py-16 text-center">
                                 <i class="fa-solid fa-clock mb-3 block text-3xl text-slate-300"></i>
                                 <p class="text-sm font-medium text-slate-500">Tidak ada data pada periode ini.</p>
                             </td>

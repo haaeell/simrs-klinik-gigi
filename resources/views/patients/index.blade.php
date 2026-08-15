@@ -27,6 +27,7 @@
             <table class="w-full text-left text-sm">
                 <thead class="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                     <tr>
+                        <th class="px-5 py-3 font-medium">No</th>
                         <th class="px-5 py-3 font-medium">No RM</th>
                         <th class="px-5 py-3 font-medium">NIK</th>
                         <th class="px-5 py-3 font-medium">Nama</th>
@@ -40,6 +41,7 @@
                 <tbody class="divide-y divide-slate-100">
                     @forelse ($patients as $patient)
                         <tr class="hover:bg-slate-50/60">
+                            <td class="px-5 py-3.5 text-slate-500">{{ $loop->iteration + ($patients->currentPage() - 1) * $patients->perPage() }}</td>
                             <td class="px-5 py-3.5 font-mono text-xs font-medium text-blue-700">{{ $patient->medical_record_number }}</td>
                             <td class="px-5 py-3.5 text-slate-500">{{ $patient->nik ?: '-' }}</td>
                             <td class="px-5 py-3.5 font-medium text-slate-900">{{ $patient->name }}</td>
@@ -52,23 +54,26 @@
                             <td class="px-5 py-3.5">
                                 <div class="flex items-center justify-end gap-1.5">
                                     <a href="{{ route('patients.show', $patient) }}"
-                                        class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-blue-600" title="Detail">
+                                        class="group/tooltip relative inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-blue-600">
                                         <i class="fa-solid fa-eye"></i>
+                                        <span class="pointer-events-none absolute -top-8 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-800 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-sm transition-opacity duration-150 group-hover/tooltip:opacity-100">Detail</span>
                                     </a>
                                     <a href="{{ route('patients.edit', $patient) }}"
-                                        class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-blue-600" title="Edit">
+                                        class="group/tooltip relative inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-blue-600">
                                         <i class="fa-solid fa-pen"></i>
+                                        <span class="pointer-events-none absolute -top-8 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-800 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-sm transition-opacity duration-150 group-hover/tooltip:opacity-100">Edit</span>
                                     </a>
                                     <a href="{{ route('queues.create', ['patient_id' => $patient->id]) }}"
-                                        class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-blue-50 hover:text-blue-600" title="Buat Antrean & Pilih Dokter">
+                                        class="group/tooltip relative inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-blue-50 hover:text-blue-600">
                                         <i class="fa-solid fa-ticket"></i>
+                                        <span class="pointer-events-none absolute -top-8 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-800 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-sm transition-opacity duration-150 group-hover/tooltip:opacity-100">Buat Antrean & Pilih Dokter</span>
                                     </a>
                                 </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="px-5 py-16 text-center">
+                            <td colspan="9" class="px-5 py-16 text-center">
                                 <i class="fa-solid fa-users mb-3 block text-3xl text-slate-300"></i>
                                 <p class="text-sm font-medium text-slate-500">
                                     {{ request('search') ? 'Tidak ada pasien yang cocok dengan pencarian.' : 'Belum ada data pasien.' }}

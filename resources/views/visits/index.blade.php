@@ -21,6 +21,7 @@
             <table class="w-full text-left text-sm">
                 <thead class="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                     <tr>
+                        <th class="px-5 py-3 font-medium">No</th>
                         <th class="px-5 py-3 font-medium">Tanggal</th>
                         <th class="px-5 py-3 font-medium">No RM</th>
                         <th class="px-5 py-3 font-medium">Pasien</th>
@@ -34,6 +35,7 @@
                 <tbody class="divide-y divide-slate-100">
                     @forelse ($visits as $visit)
                         <tr class="hover:bg-slate-50/60">
+                            <td class="px-5 py-3.5 text-slate-500">{{ $loop->iteration + ($visits->currentPage() - 1) * $visits->perPage() }}</td>
                             <td class="px-5 py-3.5 text-slate-500">{{ $visit->visit_date->translatedFormat('d M Y') }}</td>
                             <td class="px-5 py-3.5 font-mono text-xs font-medium text-blue-700">{{ $visit->patient->medical_record_number }}</td>
                             <td class="px-5 py-3.5 font-medium text-slate-900">{{ $visit->patient->name }}</td>
@@ -54,7 +56,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="px-5 py-16 text-center">
+                            <td colspan="9" class="px-5 py-16 text-center">
                                 <i class="fa-solid fa-notes-medical mb-3 block text-3xl text-slate-300"></i>
                                 <p class="text-sm font-medium text-slate-500">
                                     {{ request('search') ? 'Tidak ada rekam medis yang cocok dengan pencarian.' : 'Belum ada riwayat pemeriksaan.' }}

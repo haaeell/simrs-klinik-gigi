@@ -14,15 +14,17 @@
 </head>
 <body class="min-h-screen bg-slate-100 py-10 antialiased print:bg-white print:py-0">
 
-    <div class="mx-auto mb-6 flex w-full max-w-xs items-center justify-between px-1 print:hidden">
-        <a href="{{ route('queues.index') }}" class="text-sm font-medium text-slate-500 hover:text-slate-700">
-            <i class="fa-solid fa-arrow-left mr-1"></i> Kembali ke Antrean
-        </a>
-        <button type="button" onclick="window.print()"
-            class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
-            <i class="fa-solid fa-print"></i> Cetak
-        </button>
-    </div>
+    @unless (request()->boolean('embed'))
+        <div class="mx-auto mb-6 flex w-full max-w-xs items-center justify-between px-1 print:hidden">
+            <a href="{{ route('queues.index') }}" class="text-sm font-medium text-slate-500 hover:text-slate-700">
+                <i class="fa-solid fa-arrow-left mr-1"></i> Kembali ke Antrean
+            </a>
+            <button type="button" onclick="window.print()"
+                class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
+                <i class="fa-solid fa-print"></i> Cetak
+            </button>
+        </div>
+    @endunless
 
     @php
         $clinic = \App\Models\SystemSetting::current();

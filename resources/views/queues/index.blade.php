@@ -51,6 +51,7 @@
             <table class="w-full text-left text-sm">
                 <thead class="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                     <tr>
+                        <th class="px-5 py-3 font-medium">No</th>
                         <th class="px-5 py-3 font-medium">Nomor Antrean</th>
                         <th class="px-5 py-3 font-medium">Pasien</th>
                         <th class="px-5 py-3 font-medium">No RM</th>
@@ -65,6 +66,7 @@
                 <tbody class="divide-y divide-slate-100">
                     @forelse ($queues as $queue)
                         <tr data-queue-row="{{ $queue->id }}" class="hover:bg-slate-50/60">
+                            <td class="px-5 py-3.5 text-slate-500">{{ $loop->iteration }}</td>
                             <td class="px-5 py-3.5 font-mono text-sm font-semibold text-slate-900">{{ $queue->queue_number }}</td>
                             <td class="px-5 py-3.5">
                                 <a href="{{ route('patients.show', $queue->patient) }}" class="font-medium text-slate-900 hover:text-blue-600"
@@ -92,6 +94,10 @@
                             </td>
                             <td class="px-5 py-3.5">
                                 <div class="flex items-center justify-end gap-2">
+                                    <button type="button" data-print-queue data-url="{{ route('queues.print', $queue) }}?embed=1" title="Cetak struk antrean"
+                                        class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-300 text-slate-500 hover:bg-slate-50 hover:text-blue-600">
+                                        <i class="fa-solid fa-print"></i>
+                                    </button>
                                     <div data-status-actions="waiting" class="flex items-center gap-2 {{ $queue->status !== 'waiting' ? 'hidden' : '' }}">
                                         <button type="button" data-queue-action data-call-action data-url="{{ route('queues.call', $queue) }}"
                                             data-queue-number="{{ $queue->queue_number }}" data-room-id="{{ $queue->room_id }}"
@@ -143,7 +149,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="px-5 py-16 text-center">
+                            <td colspan="10" class="px-5 py-16 text-center">
                                 <i class="fa-solid fa-list-ol mb-3 block text-3xl text-slate-300"></i>
                                 <p class="text-sm font-medium text-slate-500">Belum ada antrean hari ini.</p>
                                 <a href="{{ route('patients.index') }}" class="mt-3 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
@@ -157,6 +163,30 @@
         </div>
     </div>
 
+    <div id="print-queue-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 p-4">
+        <div class="flex max-h-[90vh] w-full max-w-sm flex-col overflow-hidden rounded-2xl bg-white shadow-xl">
+            <div class="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+                <h3 class="text-sm font-semibold text-slate-900">Struk Antrean</h3>
+                <button type="button" id="print-queue-modal-close" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto bg-slate-100">
+                <iframe id="print-queue-modal-frame" class="h-[60vh] w-full" title="Struk Antrean"></iframe>
+            </div>
+            <div class="flex items-center justify-end gap-2 border-t border-slate-200 px-4 py-3">
+                <button type="button" id="print-queue-modal-cancel"
+                    class="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">
+                    Tutup
+                </button>
+                <button type="button" id="print-queue-modal-print"
+                    class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+                    <i class="fa-solid fa-print"></i> Cetak
+                </button>
+            </div>
+        </div>
+    </div>
+
     @php
         $activeRoomsForJs = $activeRooms->map(fn ($room) => [
             'id' => $room->id,
@@ -167,5 +197,35 @@
     @endphp
     <script>
         window.activeRooms = @json($activeRoomsForJs);
+
+        (function () {
+            const modal = document.getElementById('print-queue-modal');
+            const frame = document.getElementById('print-queue-modal-frame');
+
+            function openModal(url) {
+                frame.src = url;
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+
+            function closeModal() {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                frame.src = 'about:blank';
+            }
+
+            document.querySelectorAll('[data-print-queue]').forEach((button) => {
+                button.addEventListener('click', () => openModal(button.dataset.url));
+            });
+
+            document.getElementById('print-queue-modal-close')?.addEventListener('click', closeModal);
+            document.getElementById('print-queue-modal-cancel')?.addEventListener('click', closeModal);
+            document.getElementById('print-queue-modal-print')?.addEventListener('click', () => {
+                frame.contentWindow?.print();
+            });
+            modal?.addEventListener('click', (event) => {
+                if (event.target === modal) closeModal();
+            });
+        })();
     </script>
 @endsection

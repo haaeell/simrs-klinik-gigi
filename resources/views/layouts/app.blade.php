@@ -38,56 +38,98 @@
             </button>
         </div>
 
-        <nav class="flex-1 space-y-1 overflow-y-auto px-3 py-4">
+        <nav class="flex-1 space-y-5 overflow-y-auto px-3 py-4">
             @php
                 $user = auth()->user();
 
                 if ($user->isPasien()) {
-                    $menuItems = [
-                        ['label' => 'Dashboard', 'icon' => 'fa-house', 'route' => 'patient.dashboard'],
-                        ['label' => 'Antrean Saya', 'icon' => 'fa-list-ol', 'route' => 'patient.queue'],
-                        ['label' => 'Riwayat Kunjungan', 'icon' => 'fa-clock-rotate-left', 'route' => 'patient.history'],
-                        ['label' => 'Odontogram', 'icon' => 'fa-tooth', 'route' => 'patient.odontogram'],
-                        ['label' => 'Jadwal Kontrol', 'icon' => 'fa-calendar-check', 'route' => 'patient.control-schedules'],
-                        ['label' => 'Notifikasi', 'icon' => 'fa-bell', 'route' => 'patient.notifications'],
-                        ['label' => 'Profil', 'icon' => 'fa-user', 'route' => 'patient.profile'],
+                    $menuGroups = [
+                        [
+                            'label' => null,
+                            'items' => [
+                                ['label' => 'Dashboard', 'icon' => 'fa-house', 'route' => 'patient.dashboard'],
+                                ['label' => 'Antrean Saya', 'icon' => 'fa-list-ol', 'route' => 'patient.queue'],
+                                ['label' => 'Riwayat Kunjungan', 'icon' => 'fa-clock-rotate-left', 'route' => 'patient.history'],
+                                ['label' => 'Odontogram', 'icon' => 'fa-tooth', 'route' => 'patient.odontogram'],
+                                ['label' => 'Jadwal Kontrol', 'icon' => 'fa-calendar-check', 'route' => 'patient.control-schedules'],
+                                ['label' => 'Notifikasi', 'icon' => 'fa-bell', 'route' => 'patient.notifications'],
+                            ],
+                        ],
+                        [
+                            'label' => 'Akun',
+                            'items' => [
+                                ['label' => 'Profil', 'icon' => 'fa-user', 'route' => 'patient.profile'],
+                            ],
+                        ],
                     ];
                 } else {
-                    $menuItems = [
-                        ['label' => 'Dashboard', 'icon' => 'fa-house', 'route' => 'dashboard'],
-                        ['label' => $user->isAdmin() ? 'Antrean' : 'Antrean Pasien', 'icon' => 'fa-list-ol', 'route' => 'queues.index'],
-                        ['label' => 'Pasien', 'icon' => 'fa-users', 'route' => 'patients.index'],
-                        ['label' => 'Rekam Medis', 'icon' => 'fa-notes-medical', 'route' => 'visits.index'],
-                        ['label' => 'Jadwal Kontrol', 'icon' => 'fa-calendar-check', 'route' => 'control-schedules.index'],
-                        ['label' => 'Laporan', 'icon' => 'fa-chart-line', 'route' => 'reports.visits'],
-                        ['label' => 'Pengguna', 'icon' => 'fa-user-doctor', 'route' => 'users.index', 'adminOnly' => true],
-                        ['label' => 'Ruangan', 'icon' => 'fa-door-open', 'route' => 'rooms.index', 'adminOnly' => true],
-                        ['label' => 'Pengaturan Sistem', 'icon' => 'fa-gear', 'route' => 'settings.edit', 'adminOnly' => true],
+                    $menuGroups = [
+                        [
+                            'label' => 'Menu Utama',
+                            'items' => [
+                                ['label' => 'Dashboard', 'icon' => 'fa-house', 'route' => 'dashboard'],
+                                ['label' => $user->isAdmin() ? 'Antrean' : 'Antrean Pasien', 'icon' => 'fa-list-ol', 'route' => 'queues.index'],
+                                ['label' => 'Pasien', 'icon' => 'fa-users', 'route' => 'patients.index'],
+                                ['label' => 'Rekam Medis', 'icon' => 'fa-notes-medical', 'route' => 'visits.index'],
+                                ['label' => 'Jadwal Kontrol', 'icon' => 'fa-calendar-check', 'route' => 'control-schedules.index'],
+                                ['label' => 'Laporan', 'icon' => 'fa-chart-line', 'route' => 'reports.visits'],
+                            ],
+                        ],
+                        [
+                            'label' => 'Administrasi',
+                            'adminOnly' => true,
+                            'items' => [
+                                ['label' => 'Pengguna', 'icon' => 'fa-user-doctor', 'route' => 'users.index'],
+                                ['label' => 'Ruangan', 'icon' => 'fa-door-open', 'route' => 'rooms.index'],
+                                ['label' => 'Pengaturan Sistem', 'icon' => 'fa-gear', 'route' => 'settings.edit'],
+                            ],
+                        ],
                     ];
                 }
             @endphp
 
-            @foreach ($menuItems as $item)
-                @continue(($item['adminOnly'] ?? false) && ! $user->isAdmin())
-                @php
-                    // Patient-portal routes all share a "patient." prefix (one page per menu item), so the
-                    // section key must be the full route name there; admin/dokter routes group multiple pages
-                    // under one resource segment (e.g. "visits.show" should still highlight "Rekam Medis").
-                    $prefix = str_starts_with($item['route'], 'patient.') ? $item['route'] : explode('.', $item['route'])[0];
-                    $isActive = request()->routeIs($prefix.'*') || request()->routeIs($prefix.'.*');
-                    $exists = \Illuminate\Support\Facades\Route::has($item['route']);
-                @endphp
-                <a href="{{ $exists ? route($item['route']) : '#' }}"
-                   class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors
-                        {{ $isActive ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}
-                        {{ $exists ? '' : 'pointer-events-none opacity-40' }}">
-                    <i class="fa-solid {{ $item['icon'] }} w-4 text-center {{ $isActive ? 'text-blue-600' : 'text-slate-400' }}"></i>
-                    {{ $item['label'] }}
-                </a>
+            @foreach ($menuGroups as $group)
+                @continue(($group['adminOnly'] ?? false) && ! $user->isAdmin())
+                <div>
+                    @if ($group['label'])
+                        <p class="mb-1.5 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400">{{ $group['label'] }}</p>
+                    @endif
+                    <div class="space-y-0.5">
+                        @foreach ($group['items'] as $item)
+                            @php
+                                // Patient-portal routes all share a "patient." prefix (one page per menu item), so the
+                                // section key must be the full route name there; admin/dokter routes group multiple pages
+                                // under one resource segment (e.g. "visits.show" should still highlight "Rekam Medis").
+                                $prefix = str_starts_with($item['route'], 'patient.') ? $item['route'] : explode('.', $item['route'])[0];
+                                $isActive = request()->routeIs($prefix.'*') || request()->routeIs($prefix.'.*');
+                                $exists = \Illuminate\Support\Facades\Route::has($item['route']);
+                            @endphp
+                            <a href="{{ $exists ? route($item['route']) : '#' }}"
+                               class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors
+                                    {{ $isActive ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}
+                                    {{ $exists ? '' : 'pointer-events-none opacity-40' }}">
+                                <i class="fa-solid {{ $item['icon'] }} w-4 text-center {{ $isActive ? 'text-blue-600' : 'text-slate-400 group-hover:text-slate-500' }}"></i>
+                                <span class="truncate">{{ $item['label'] }}</span>
+                                @if ($isActive)
+                                    <span class="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-blue-600"></span>
+                                @endif
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
             @endforeach
         </nav>
 
         <div class="shrink-0 border-t border-slate-200 p-3">
+            <div class="mb-1 flex items-center gap-3 rounded-xl px-3 py-2">
+                <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-600 text-xs font-semibold text-white">
+                    {{ strtoupper(substr($user->name, 0, 1)) }}
+                </span>
+                <span class="min-w-0 leading-tight">
+                    <span class="block truncate text-sm font-medium text-slate-900">{{ $user->name }}</span>
+                    <span class="block truncate text-xs text-slate-400">{{ $user->role_label }}</span>
+                </span>
+            </div>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-red-50 hover:text-red-600">

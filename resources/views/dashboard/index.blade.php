@@ -152,6 +152,7 @@
                     <table class="w-full text-left text-sm">
                         <thead class="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                             <tr>
+                                <th class="px-5 py-3 font-medium">No</th>
                                 <th class="px-5 py-3 font-medium">No Antrean</th>
                                 <th class="px-5 py-3 font-medium">Pasien</th>
                                 <th class="px-5 py-3 font-medium">Jam Daftar</th>
@@ -162,6 +163,7 @@
                         <tbody class="divide-y divide-slate-100">
                             @forelse ($queueRows as $queue)
                                 <tr class="hover:bg-slate-50/60">
+                                    <td class="px-5 py-3.5 text-slate-500">{{ $loop->iteration }}</td>
                                     <td class="px-5 py-3.5 font-mono text-sm font-semibold text-slate-900">{{ $queue->queue_number }}</td>
                                     <td class="px-5 py-3.5 font-medium text-slate-900">{{ $queue->patient->name }}</td>
                                     <td class="px-5 py-3.5 text-slate-500">{{ $queue->created_at->format('H:i') }}</td>
@@ -177,7 +179,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="px-5 py-16 text-center">
+                                    <td colspan="6" class="px-5 py-16 text-center">
                                         <i class="fa-solid fa-list-ol mb-3 block text-3xl text-slate-300"></i>
                                         <p class="text-sm font-medium text-slate-500">Belum ada antrean hari ini.</p>
                                         <a href="{{ route('patients.index') }}" class="mt-3 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
@@ -202,6 +204,7 @@
                     <table class="w-full text-left text-sm">
                         <thead class="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                             <tr>
+                                <th class="px-5 py-3 font-medium">No</th>
                                 <th class="px-5 py-3 font-medium">Pasien</th>
                                 <th class="px-5 py-3 font-medium">Dokter</th>
                                 <th class="px-5 py-3 font-medium">Tanggal</th>
@@ -212,6 +215,7 @@
                         <tbody class="divide-y divide-slate-100">
                             @forelse ($recentVisits as $visit)
                                 <tr class="hover:bg-slate-50/60">
+                                    <td class="px-5 py-3.5 text-slate-500">{{ $loop->iteration }}</td>
                                     <td class="px-5 py-3.5 font-medium text-slate-900">
                                         <a href="{{ route('visits.show', $visit) }}" class="hover:text-blue-600">{{ $visit->patient->name }}</a>
                                     </td>
@@ -224,7 +228,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="px-5 py-16 text-center">
+                                    <td colspan="6" class="px-5 py-16 text-center">
                                         <i class="fa-solid fa-notes-medical mb-3 block text-3xl text-slate-300"></i>
                                         <p class="text-sm font-medium text-slate-500">Belum ada kunjungan.</p>
                                     </td>
@@ -275,6 +279,7 @@
                     <table class="w-full text-left text-sm">
                         <thead class="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                             <tr>
+                                <th class="px-5 py-3 font-medium">No</th>
                                 <th class="px-5 py-3 font-medium">No Antrean</th>
                                 <th class="px-5 py-3 font-medium">Pasien</th>
                                 <th class="px-5 py-3 font-medium">No RM</th>
@@ -285,6 +290,7 @@
                         <tbody class="divide-y divide-slate-100">
                             @forelse ($nextQueues as $queue)
                                 <tr class="hover:bg-slate-50/60">
+                                    <td class="px-5 py-3.5 text-slate-500">{{ $loop->iteration }}</td>
                                     <td class="px-5 py-3.5 font-mono text-sm font-semibold text-slate-900">{{ $queue->queue_number }}</td>
                                     <td class="px-5 py-3.5 font-medium text-slate-900">{{ $queue->patient->name }}</td>
                                     <td class="px-5 py-3.5 font-mono text-xs text-slate-500">{{ $queue->patient->medical_record_number }}</td>
@@ -308,7 +314,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="px-5 py-16 text-center">
+                                    <td colspan="6" class="px-5 py-16 text-center">
                                         <i class="fa-solid fa-list-ol mb-3 block text-3xl text-slate-300"></i>
                                         <p class="text-sm font-medium text-slate-500">Belum ada antrean pasien hari ini.</p>
                                     </td>

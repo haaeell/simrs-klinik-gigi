@@ -27,6 +27,7 @@
             <table class="w-full text-left text-sm">
                 <thead class="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                     <tr>
+                        <th class="px-5 py-3 font-medium">No</th>
                         <th class="px-5 py-3 font-medium">Nama</th>
                         <th class="px-5 py-3 font-medium">Email</th>
                         <th class="px-5 py-3 font-medium">Role</th>
@@ -36,6 +37,7 @@
                 <tbody class="divide-y divide-slate-100">
                     @forelse ($users as $user)
                         <tr class="hover:bg-slate-50/60">
+                            <td class="px-5 py-3.5 text-slate-500">{{ $loop->iteration + ($users->currentPage() - 1) * $users->perPage() }}</td>
                             <td class="px-5 py-3.5 font-medium text-slate-900">{{ $user->name }}</td>
                             <td class="px-5 py-3.5 text-slate-500">{{ $user->email }}</td>
                             <td class="px-5 py-3.5">
@@ -72,7 +74,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="px-5 py-16 text-center">
+                            <td colspan="5" class="px-5 py-16 text-center">
                                 <i class="fa-solid fa-user-doctor mb-3 block text-3xl text-slate-300"></i>
                                 <p class="text-sm font-medium text-slate-500">Belum ada pengguna yang cocok.</p>
                                 <a href="{{ route('users.create') }}" class="mt-3 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
