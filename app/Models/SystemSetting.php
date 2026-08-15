@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
-#[Fillable(['clinic_name', 'address', 'phone', 'email', 'logo_path', 'primary_color'])]
 class SystemSetting extends Model
 {
+    protected $fillable = ['clinic_name', 'address', 'phone', 'email', 'logo_path', 'primary_color'];
+
     /**
      * Single settings row for clinic branding — memoized per request so the layout,
      * login page, TV display, and print headers can all call this without repeating

@@ -2,19 +2,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\DB;
 
-#[Fillable([
-    'patient_id', 'queue_number', 'queue_date', 'status', 'registration_source', 'room_id', 'complaint',
-    'called_at', 'started_at', 'finished_at',
-])]
 class Queue extends Model
 {
+    protected $fillable = [
+        'patient_id', 'queue_number', 'queue_date', 'status', 'registration_source', 'room_id', 'complaint',
+        'called_at', 'started_at', 'finished_at',
+    ];
+
     /**
      * A queue still "in play" today — blocks the same patient from getting a second number.
      */

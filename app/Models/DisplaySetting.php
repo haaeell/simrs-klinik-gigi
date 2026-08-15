@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable([
-    'announcement_template', 'chime_style', 'voice_name', 'voice_lang', 'voice_rate', 'voice_pitch',
-])]
 class DisplaySetting extends Model
 {
+    protected $fillable = [
+        'announcement_template', 'chime_style', 'voice_name', 'voice_lang', 'voice_rate', 'voice_pitch',
+    ];
+
     public const CHIME_STYLES = [
         'ding-dong' => 'Ding-Dong',
         'bell' => 'Lonceng Tunggal',

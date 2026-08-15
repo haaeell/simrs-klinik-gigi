@@ -2,15 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Collection;
 
-#[Fillable(['patient_id', 'visit_id', 'doctor_id', 'control_date', 'notes', 'status'])]
 class ControlSchedule extends Model
 {
+    protected $fillable = ['patient_id', 'visit_id', 'doctor_id', 'control_date', 'notes', 'status'];
+
     public const STATUSES = ['scheduled' => 'Terjadwal', 'completed' => 'Selesai', 'cancelled' => 'Dibatalkan'];
 
     protected function casts(): array

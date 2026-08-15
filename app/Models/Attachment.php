@@ -2,16 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-#[Fillable(['patient_id', 'visit_id', 'type', 'original_name', 'file_path', 'description'])]
 class Attachment extends Model
 {
+    protected $fillable = ['patient_id', 'visit_id', 'type', 'original_name', 'file_path', 'description'];
+
     public const TYPES = [
         'xray' => 'X-Ray',
         'photo' => 'Foto',

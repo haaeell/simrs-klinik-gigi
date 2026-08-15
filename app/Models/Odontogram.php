@@ -2,18 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 
-#[Fillable([
-    'patient_id', 'visit_id', 'doctor_id', 'examination_date',
-    'occlusion', 'torus_palatinus', 'torus_mandibularis', 'palate', 'diastema', 'dental_anomaly', 'notes',
-])]
 class Odontogram extends Model
 {
+    protected $fillable = [
+        'patient_id', 'visit_id', 'doctor_id', 'examination_date',
+        'occlusion', 'torus_palatinus', 'torus_mandibularis', 'palate', 'diastema', 'dental_anomaly', 'notes',
+    ];
+
     public const UPPER_TEETH = ['18', '17', '16', '15', '14', '13', '12', '11', '21', '22', '23', '24', '25', '26', '27', '28'];
 
     public const LOWER_TEETH = ['48', '47', '46', '45', '44', '43', '42', '41', '31', '32', '33', '34', '35', '36', '37', '38'];

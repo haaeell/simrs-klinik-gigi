@@ -2,19 +2,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable([
-    'patient_id', 'queue_id', 'doctor_id', 'visit_date',
-    'complaint', 'diagnosis', 'icd10_code', 'notes', 'status',
-])]
 class Visit extends Model
 {
+    protected $fillable = [
+        'patient_id', 'queue_id', 'doctor_id', 'visit_date',
+        'complaint', 'diagnosis', 'icd10_code', 'notes', 'status',
+    ];
+
     protected function casts(): array
     {
         return [

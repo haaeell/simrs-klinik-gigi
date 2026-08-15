@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['room_id', 'day_of_week', 'start_time', 'end_time'])]
 class RoomSchedule extends Model
 {
+    protected $fillable = ['room_id', 'day_of_week', 'start_time', 'end_time'];
+
     public const DAYS = [
         0 => 'Minggu',
         1 => 'Senin',
