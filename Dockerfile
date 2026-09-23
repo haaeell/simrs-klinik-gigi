@@ -29,6 +29,7 @@ RUN apt-get update && apt-get install -y \
     libicu-dev \
     libpq-dev \
     libzip-dev \
+    curl \
     unzip \
     && docker-php-ext-install \
     pdo_mysql \
@@ -54,14 +55,20 @@ WORKDIR /var/www/html
 
 COPY --from=vendor /app /var/www/html
 COPY --from=frontend /app/public/build /var/www/html/public/build
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 
 RUN mkdir -p storage/framework/cache \
     storage/framework/sessions \
     storage/framework/views \
+    storage/app/public \
     bootstrap/cache \
-    && php artisan storage:link || true \
-    && chown -R www-data:www-data storage bootstrap/cache
+    && chown -R www-data:www-data storage bootstrap/cache \
+    && chmod +x /usr/local/bin/docker-entrypoint
 
 EXPOSE 80
 
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+    CMD curl --fail --silent http://localhost/up || exit 1
+
+ENTRYPOINT ["docker-entrypoint"]
 CMD ["apache2-foreground"]
