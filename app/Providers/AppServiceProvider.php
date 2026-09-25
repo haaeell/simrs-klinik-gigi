@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +20,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Safety net: walau APP_URL di server lupa diganti ke https,
+        // semua URL yang digenerate (asset, route, @vite) tetap https di production.
+        if ($this->app->environment('production')) {
+            URL::forceScheme('https');
+        }
     }
 }

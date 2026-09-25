@@ -12,6 +12,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Docker di VPS: TLS di-terminate di reverse proxy di depan container
+        // (container hanya dengar port 80), jadi percayai X-Forwarded-* agar
+        // $request->isSecure(), asset(), route(), dan @vite() pakai https.
+        $middleware->trustProxies(at: '*');
+
         $middleware->redirectGuestsTo(fn () => route('login'));
         $middleware->redirectUsersTo(fn (Request $request) => $request->user()?->isPasien() ? route('patient.dashboard') : route('dashboard'));
 
